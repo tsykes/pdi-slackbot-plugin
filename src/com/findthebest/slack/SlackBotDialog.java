@@ -378,19 +378,21 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         customMessageButtonForm.top = new FormAttachment(standardFailureLabel,margin);
         customMessageButton.setLayoutData(customMessageButtonForm);
 
-        /*final int customMessage = new int;
+        Listener lsCustom = new Listener(){
+            public void handleEvent(Event e){customTextInput.setEnabled(true);}
+        };
 
-        Listener customListener = new Listener(){
-            public void handleEvent(Event event){
+        Listener lsSuccess = new Listener(){
+            public void handleEvent(Event e){customTextInput.setEnabled(false);}
+        };
 
-                if(event.widget == customMessageButton) {
-                    customMessage = 1;
-                }
-                else{
-                    customMessage = 0;
-                }
-            }
-        }*/
+        Listener lsFailure = new Listener(){
+            public void handleEvent(Event e){customTextInput.setEnabled(false);}
+        };
+
+        customMessageButton.addListener(SWT.Selection, lsCustom);
+        standardFailureButton.addListener(SWT.Selection, lsFailure);
+        standardSuccessButton.addListener(SWT.Selection, lsSuccess);
 
         customMessageLabel = new Label(contentGroup, SWT.LEFT);
         customMessageLabel.setToolTipText("Send a customized message you write below");
@@ -401,6 +403,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         customMessageLabelForm.right = new FormAttachment(100, 0);
         customMessageLabelForm.top = new FormAttachment(standardFailureLabel, margin);
         customMessageLabel.setLayoutData(customMessageLabelForm);
+
 
         // Separator Line between checkboxes and custom message input
         Label separator2 = new Label(contentGroup, SWT.HORIZONTAL | SWT.SEPARATOR);
@@ -429,6 +432,10 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         customTextInputForm.top = new FormAttachment(customTextLabel, margin);
         customTextInputForm.bottom = new FormAttachment(customTextLabel, 150);
         customTextInput.setLayoutData(customTextInputForm);
+
+        /*
+         * Add listener to radio button
+         */
 
         /*//Place all the above into tab item "Text"
         TabItem text = new TabItem(tabFolder, SWT.NONE);
