@@ -249,9 +249,9 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
             SlackConnection slack = new SlackConnection();
             String msg;
             if (successMsg) {
-                msg = "Job executed successfully";
+                msg = ":white_check_mark: Job executed successfully";
             } else if (failureMsg) {
-                msg = "Job failed";
+                msg = ":x: Job failed";
             } else {
                 msg = customText;
             }
