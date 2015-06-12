@@ -92,13 +92,13 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
     public static final String STEP_VERSION = "v0.1";
 
     // the text box for the job entry name
-    private Text wName;
+    private Text wName, customTextInput, channelInput;
     // the combo box for the outcomes
     private CCombo wOutcome;
 
     // output field name
     private TextVar emailInput, passwordInput, appIDInput,
-            listDelimiterInput, customTextInput, channelInput;
+            listDelimiterInput;
 
     private Label emailLabel, passwordLabel, channelUpdateButtonLabel,
             appIDLabel, dataFieldLabel, listDelimiterLabel, insertNoMatchLabel,
@@ -229,6 +229,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         fdName.right = new FormAttachment(100, 0);
         wName.setLayoutData(fdName);
 
+
         // Separator Line
         Label separator1 = new Label(shell, SWT.HORIZONTAL | SWT.SEPARATOR);
         FormData fdSeparator1 = new FormData();
@@ -286,7 +287,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         channelLabel.setLayoutData(channelLabelGrid);
 
         //Fill in Drop Down Box
-        channelInput = new TextVar(jobMeta,recipientGroup, SWT.SINGLE | SWT.LEFT);
+        channelInput = new Text(recipientGroup, SWT.SINGLE | SWT.LEFT);
         props.setLook(channelInput);
         channelInput.addModifyListener(lsMod);
         channelInputGrid = new GridData();
@@ -419,7 +420,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         customTextLabelForm.top = new FormAttachment(separator2, margin);
         customTextLabel.setLayoutData(customTextLabelForm);
 
-        customTextInput = new TextVar(jobMeta,contentGroup , SWT.MULTI | SWT.LEFT | SWT.WRAP);
+        customTextInput = new Text(contentGroup , SWT.MULTI | SWT.LEFT | SWT.WRAP);
         props.setLook(customTextInput);
         customTextInput.addModifyListener(lsMod);
         customTextInputForm = new FormData();
@@ -512,7 +513,6 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         // setting the name of the job entry
         if (meta.getName() != null){
             wName.setText(meta.getName());
-            channelInput.setItems(meta.getChannelList());
             standardSuccessButton.setSelection(meta.isSuccessMsg());
             standardFailureButton.setSelection(meta.isFailureMsg());
             customMessageButton.setSelection(meta.isCustomMsg());
@@ -558,7 +558,6 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         meta.setSuccessMsg(standardSuccessButton.getSelection());
         meta.setFailureMsg(standardFailureButton.getSelection());
         meta.setCustomMsg(customMessageButton.getSelection());
-        meta.setChannelList(channelInput.getItems());
 //        meta.setCustomText();
 
         // close dialog window and clean up
