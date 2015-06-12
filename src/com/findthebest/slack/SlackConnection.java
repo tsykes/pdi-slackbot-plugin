@@ -140,7 +140,8 @@ public class SlackConnection {
                 baseMessageUrl.append(URLEncoder.encode((String) entry.getValue(), "UTF-8"));
                 baseMessageUrl.append("&");
             }
-            baseMessageUrl.deleteCharAt(baseMessageUrl.length() - 1);
+//            baseMessageUrl.deleteCharAt(baseMessageUrl.length() - 1);
+            baseMessageUrl.append("link_names=1");
             LOGGER.config("Sending GET request");
             HttpsURLConnection con = sendGetRequest(new URL(baseMessageUrl.toString()));
             response = extractResponse(con);
