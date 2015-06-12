@@ -22,8 +22,8 @@
 
 package com.findthebest.slack;
 
+
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -33,7 +33,10 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -41,8 +44,16 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.custom.CCombo;
+
+
 import org.pentaho.di.core.Const;
 import org.pentaho.di.i18n.BaseMessages;
+import org.pentaho.di.ui.core.widget.TextVar;
 import org.pentaho.di.job.JobMeta;
 import org.pentaho.di.job.entry.JobEntryDialogInterface;
 import org.pentaho.di.job.entry.JobEntryInterface;
@@ -51,6 +62,7 @@ import org.pentaho.di.ui.core.gui.WindowProperty;
 import org.pentaho.di.ui.job.dialog.JobDialog;
 import org.pentaho.di.ui.job.entry.JobEntryDialog;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
+
 
 /**
  * This class is part of the demo job entry plug-in implementation.
@@ -77,10 +89,52 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
      */
     private static Class<?> PKG = SlackBot.class; // for i18n purposes
 
+    public static final String STEP_VERSION = "v0.1";
+
     // the text box for the job entry name
     private Text wName;
     // the combo box for the outcomes
     private CCombo wOutcome;
+
+    // output field name
+    private TextVar emailInput, passwordInput, tokenInput, appIDInput,
+            listDelimiterInput, customTextInput;
+
+    private Label emailLabel, passwordLabel, tokenLabel,
+            appIDLabel, dataFieldLabel, listDelimiterLabel, insertNoMatchLabel,
+            updateExistingLabel, updateByIDLabel, doNotReplaceLabel,
+            wipeTableLabel, deleteUnchangedLabel, emailOnSuccessLabel, channelLabel, directLabel, privateLabel,
+            standardSuccessLabel, standardFailureLabel, errorLineLabel, customMessageLabel, customTextLabel, attachLogLabel,
+            attachErrorLabel, attachWarningsLabel, customAttachmentLabel, customAttachLabel;
+    private FormData outputLabelForm, outputInputForm, emailLabelForm,
+            emailInputForm, appIDLabelForm, dataFieldLabelForm,
+            listDelimiterLabelForm, insertNoMatchLabelForm,
+            updateExistingLabelForm, updateByIDLabelForm,
+            doNotReplaceLabelForm, wipeTableLabelForm, customTextLabelForm,
+            deleteUnchangedLabelForm, emailOnSuccessLabelForm, tokenVerifyForm, recipientGroupForm, contentGroupForm, standardSuccessButtonForm,
+            standardSuccessLabelForm,textCompositeLayoutForm, attachCompositeLayoutForm, standardFailureLabelForm, standardFailureButtonForm, errorLineButtonForm, customMessageButtonForm,
+            customMessageLabelForm, errorLineLabelForm, attachLogLabelForm, attachErrorLabelForm, attachWarningsLabelForm, customAttachmentLabelForm,
+            customAttachLabelForm;
+    private FormData passwordInputForm, passwordLabelForm, tokenInputForm,
+            tokenLabelForm, appIDInputForm, listDelimiterInputForm,
+            insertNoMatchInputForm, updateExistingInputForm,
+            updateByIDInputForm, doNotReplaceInputForm, wipeTableInputForm,
+            deleteUnchangedInputForm, fields, emailOnSuccessInputForm, customTextInputForm,
+            attachLogButtonForm, attachErrorButtonForm, attachWarningsButtonForm, customAttachmentButtonForm, tabFolderForm;
+    private GridData channelLabelGrid, channelInputGrid, directInputGrid, directLabelGrid, privateLabelGrid, privateInputGrid;
+    private String[] incoming_fields = null;
+    private Combo field_options, channelInput, directInput, privateInput;
+    private Button insertNoMatchButton, updateExistingButton, updateByIDButton,
+            doNotReplaceButton, wipeTableButton, deleteUnchangedButton,
+            emailOnSuccessButton, tokenVerify, textButton, attachmentButton, standardSuccessButton, standardFailureButton,
+            errorLineButton, customMessageButton, attachLogButton, attachErrorButton, attachWarningsButton, customAttachmentButton;
+    private Group recipientGroup, contentGroup;
+    private Composite textComposite, attachComposite;
+    private TabFolder tabFolder;
+    private TabItem text, attachment;
+
+    private JobMeta jobMeta;
+    private String sname;
 
     // the job entry configuration object
     private SlackBot meta;
@@ -149,10 +203,13 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         formLayout.marginHeight = Const.FORM_MARGIN;
 
         shell.setLayout(formLayout);
-        shell.setText(BaseMessages.getString(PKG, "SlackBot.Shell.Title"));
+        shell.setSize(120,220);
+        shell.setText("Slack Messages " + SlackBotDialog.STEP_VERSION);
 
         int middle = props.getMiddlePct();
         int margin = Const.MARGIN;
+
+        //Start building UI elements
 
         // Job entry name line
         Label wlName = new Label(shell, SWT.RIGHT);
@@ -193,6 +250,366 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         fdOutcome.right = new FormAttachment(100, 0);
         //fdOutcome.bottom = new FormAttachment(100, -40);
         wOutcome.setLayoutData(fdOutcome);
+
+
+        // Separator Line
+        Label separator1 = new Label(shell, SWT.HORIZONTAL | SWT.SEPARATOR);
+        FormData fdSeparator1 = new FormData();
+        fdSeparator1.left = new FormAttachment(0, margin);
+        fdSeparator1.top = new FormAttachment(wlOutcome, margin);
+        fdSeparator1.right = new FormAttachment(100, 0);
+        separator1.setLayoutData(fdSeparator1);
+        props.setLook(separator1);
+
+        // tokenInputForm
+        tokenLabel = new Label(shell, SWT.RIGHT);
+        tokenLabel.setText("Slack Token: ");
+        tokenLabel
+                .setToolTipText("Required if sending a direct message, or sending a message to a private group.");
+        props.setLook(tokenLabel);
+        tokenLabelForm = new FormData();
+        tokenLabelForm.left = new FormAttachment(0, 0);
+        tokenLabelForm.right = new FormAttachment(middle, -margin);
+        tokenLabelForm.top = new FormAttachment(separator1, margin);
+        tokenLabel.setLayoutData(tokenLabelForm);
+
+        tokenInput = new TextVar(jobMeta, shell, SWT.PASSWORD | SWT.SINGLE
+                | SWT.LEFT | SWT.BORDER);
+        props.setLook(tokenLabel);
+        tokenInput.addModifyListener(lsMod);
+        tokenInputForm = new FormData();
+        tokenInputForm.left = new FormAttachment(middle, 0);
+        tokenInputForm.right = new FormAttachment(75, 0);
+        tokenInputForm.top = new FormAttachment(separator1, margin);
+        tokenInput.setLayoutData(tokenInputForm);
+
+        tokenVerify = new Button(shell,SWT.PUSH);
+        tokenVerify.setText("Verify");
+        tokenVerify.setToolTipText("Verify the Slack token");
+        tokenVerifyForm = new FormData();
+        tokenVerifyForm.left = new FormAttachment(75, 10);
+        tokenVerifyForm.right = new FormAttachment(100, 0);
+        tokenVerifyForm.top = new FormAttachment(separator1, margin - 2);
+        tokenVerify.setLayoutData(tokenVerifyForm);
+
+        //Recipient Group
+
+        recipientGroup = new Group(shell,SWT.SHADOW_NONE);
+        recipientGroup.setText("To Whom?");
+        props.setLook(recipientGroup);
+        recipientGroupForm = new FormData();
+        recipientGroupForm.left = new FormAttachment(0, 0);
+        recipientGroupForm.right = new FormAttachment(100, 0);
+        recipientGroupForm.top = new FormAttachment(tokenInput, margin * 2);
+        GridLayout recipientGrid = new GridLayout();
+        recipientGrid.numColumns = 2;
+        recipientGroup.setLayout(recipientGrid);
+        recipientGroup.setLayoutData(recipientGroupForm);
+
+        channelLabel = new Label(recipientGroup, SWT.RIGHT);
+        channelLabel.setText("Channel:");
+        channelLabel.setToolTipText("The name of the Slack channel");
+        channelLabelGrid = new GridData();
+        channelLabelGrid.horizontalAlignment = GridData.FILL;
+        channelLabelGrid.grabExcessHorizontalSpace = true;
+        channelLabel.setLayoutData(channelLabelGrid);
+
+        //Fill in Drop Down Box
+        channelInput = new Combo(recipientGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
+        props.setLook(channelInput);
+        channelInputGrid = new GridData();
+        channelInputGrid.horizontalAlignment = GridData.FILL;
+        channelInputGrid.grabExcessHorizontalSpace = true;
+        channelInput.setLayoutData(channelLabelGrid);
+
+        directLabel = new Label(recipientGroup, SWT.RIGHT);
+        directLabel.setText("Direct Message:");
+        directLabel.setToolTipText("The name of contact, preceded by '@'");
+        directLabelGrid = new GridData();
+        directLabelGrid.horizontalAlignment = GridData.FILL;
+        directLabelGrid.grabExcessHorizontalSpace = true;
+        directLabel.setLayoutData(directLabelGrid);
+
+        //Fill in Drop Down Box
+        directInput = new Combo(recipientGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
+        props.setLook(directInput);
+        directInputGrid = new GridData();
+        directInputGrid.horizontalAlignment = GridData.FILL;
+        directInputGrid.grabExcessHorizontalSpace = true;
+        directInput.setLayoutData(directLabelGrid);
+
+        privateLabel = new Label(recipientGroup, SWT.RIGHT);
+        privateLabel.setText("Private Group:");
+        privateLabel.setToolTipText("The name of the private group");
+        privateLabelGrid = new GridData();
+        privateLabelGrid.horizontalAlignment = GridData.FILL;
+        privateLabelGrid.grabExcessHorizontalSpace = true;
+        privateLabel.setLayoutData(privateLabelGrid);
+
+        //Fill in Drop Down Box
+        privateInput = new Combo(recipientGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
+        props.setLook(privateInput);
+        privateInputGrid = new GridData();
+        privateInputGrid.horizontalAlignment = GridData.FILL;
+        privateInputGrid.grabExcessHorizontalSpace = true;
+        privateInput.setLayoutData(privateLabelGrid);
+
+        contentGroup = new Group(shell,SWT.SHADOW_NONE);
+        contentGroup.setText("What to Send?");
+        props.setLook(contentGroup);
+        contentGroupForm = new FormData();
+        contentGroupForm.left = new FormAttachment(0, 0);
+        contentGroupForm.right = new FormAttachment(100, 0);
+        contentGroupForm.top = new FormAttachment(recipientGroup, margin * 3);
+        FormLayout contentLayout = new FormLayout();
+        contentGroup.setLayout(contentLayout);
+        contentGroup.setLayoutData(contentGroupForm);
+
+        tabFolder = new TabFolder(contentGroup, SWT.NONE);
+        FormData tabFolderForm = new FormData();
+        tabFolderForm.left = new FormAttachment(0,0);
+        tabFolderForm.right = new FormAttachment(100,0);
+        tabFolderForm.top = new FormAttachment(0,margin);
+        tabFolder.setLayoutData(tabFolderForm);
+
+
+        Composite textComposite = new Composite(tabFolder, SWT.NONE);
+        FormLayout textCompositeLayout = new FormLayout();
+        textCompositeLayoutForm = new FormData();
+        textCompositeLayoutForm.left = new FormAttachment(0,0);
+        textCompositeLayoutForm.right = new FormAttachment(100,0);
+        textCompositeLayoutForm.top = new FormAttachment(0,margin);
+        textComposite.setLayout(textCompositeLayout);
+        textComposite.setLayoutData(textCompositeLayoutForm);
+
+        standardSuccessButton = new Button(textComposite, SWT.CHECK);
+        standardSuccessButton.setSelection(false);
+        standardSuccessButton.setSize(100, standardSuccessButton.getSize().y);
+        props.setLook(standardSuccessButton);
+        standardSuccessButtonForm = new FormData();
+        standardSuccessButtonForm.left = new FormAttachment(0, 0);
+        standardSuccessButtonForm.right = new FormAttachment(10, 0);
+        standardSuccessButtonForm.top = new FormAttachment(0,margin + 2);
+        standardSuccessButton.setLayoutData(standardSuccessButtonForm);
+
+        standardSuccessLabel = new Label(textComposite, SWT.LEFT);
+        standardSuccessLabel.setToolTipText("Send a templated success messages indicating the job has run successfully");
+        standardSuccessLabel.setText("Send Standard Success Message");
+        props.setLook(standardSuccessLabel);
+        standardSuccessLabelForm = new FormData();
+        standardSuccessLabelForm.left = new FormAttachment(10, 0);
+        standardSuccessLabelForm.right = new FormAttachment(100, 0);
+        standardSuccessLabelForm.top = new FormAttachment(0, margin + 2);
+        standardSuccessLabel.setLayoutData(standardSuccessLabelForm);
+
+        standardFailureButton = new Button(textComposite, SWT.CHECK);
+        standardFailureButton.setSelection(true);
+        standardFailureButton.setSize(100, standardFailureButton.getSize().y);
+        props.setLook(standardFailureButton);
+        standardFailureButtonForm = new FormData();
+        standardFailureButtonForm.left = new FormAttachment(0, 0);
+        standardFailureButtonForm.right = new FormAttachment(10, 0);
+        standardFailureButtonForm.top = new FormAttachment(standardSuccessLabel,margin);
+        standardFailureButton.setLayoutData(standardFailureButtonForm);
+
+        standardFailureLabel = new Label(textComposite, SWT.LEFT);
+        standardFailureLabel.setToolTipText("Send a templated failure messages indicating the job has not run successfully");
+        standardFailureLabel.setText("Send Standard Failure Message");
+        props.setLook(standardFailureLabel);
+        standardFailureLabelForm = new FormData();
+        standardFailureLabelForm.left = new FormAttachment(10, 0);
+        standardFailureLabelForm.right = new FormAttachment(100, 0);
+        standardFailureLabelForm.top = new FormAttachment(standardSuccessLabel, margin);
+        standardFailureLabel.setLayoutData(standardFailureLabelForm);
+
+        errorLineButton = new Button(textComposite, SWT.CHECK);
+        errorLineButton.setSelection(false);
+        errorLineButton.setSize(100, errorLineButton.getSize().y);
+        props.setLook(errorLineButton);
+        errorLineButtonForm = new FormData();
+        errorLineButtonForm.left = new FormAttachment(0, 0);
+        errorLineButtonForm.right = new FormAttachment(10, 0);
+        errorLineButtonForm.top = new FormAttachment(standardFailureLabel,margin);
+        errorLineButton.setLayoutData(errorLineButtonForm);
+
+        errorLineLabel = new Label(textComposite, SWT.LEFT);
+        errorLineLabel.setToolTipText("Send the error line that broke your job");
+        errorLineLabel.setText("Send Error Line");
+        props.setLook(errorLineLabel);
+        errorLineLabelForm = new FormData();
+        errorLineLabelForm.left = new FormAttachment(10, 0);
+        errorLineLabelForm.right = new FormAttachment(100, 0);
+        errorLineLabelForm.top = new FormAttachment(standardFailureLabel, margin);
+        errorLineLabel.setLayoutData(errorLineLabelForm);
+
+        customMessageButton = new Button(textComposite, SWT.CHECK);
+        customMessageButton.setSelection(false);
+        customMessageButton.setSize(100, customMessageButton.getSize().y);
+        props.setLook(customMessageButton);
+        customMessageButtonForm = new FormData();
+        customMessageButtonForm.left = new FormAttachment(0, 0);
+        customMessageButtonForm.right = new FormAttachment(10, 0);
+        customMessageButtonForm.top = new FormAttachment(errorLineLabel,margin);
+        customMessageButton.setLayoutData(customMessageButtonForm);
+
+        customMessageLabel = new Label(textComposite, SWT.LEFT);
+        customMessageLabel.setToolTipText("Send a customized message you write below");
+        customMessageLabel.setText("Send Custom Message");
+        props.setLook(customMessageLabel);
+        customMessageLabelForm = new FormData();
+        customMessageLabelForm.left = new FormAttachment(10, 0);
+        customMessageLabelForm.right = new FormAttachment(100, 0);
+        customMessageLabelForm.top = new FormAttachment(errorLineLabel, margin);
+        customMessageLabel.setLayoutData(customMessageLabelForm);
+
+        // Separator Line between checkboxes and custom message input
+        Label separator2 = new Label(textComposite, SWT.HORIZONTAL | SWT.SEPARATOR);
+        FormData fdSeparator2 = new FormData();
+        fdSeparator2.left = new FormAttachment(0, margin);
+        fdSeparator2.top = new FormAttachment(customMessageLabel, margin);
+        fdSeparator2.right = new FormAttachment(100, 0);
+        separator2.setLayoutData(fdSeparator2);
+        props.setLook(separator2);
+
+        customTextLabel = new Label(textComposite, SWT.LEFT);
+        customTextLabel.setText("Input Custom Text Here:");
+        props.setLook(customTextLabel);
+        customTextLabelForm = new FormData();
+        customTextLabelForm.left = new FormAttachment(0, 0);
+        customTextLabelForm.right = new FormAttachment(100,0);
+        customTextLabelForm.top = new FormAttachment(separator2, margin);
+        customTextLabel.setLayoutData(customTextLabelForm);
+
+        customTextInput = new TextVar(jobMeta,textComposite , SWT.MULTI | SWT.LEFT | SWT.WRAP);
+        props.setLook(customTextInput);
+        customTextInput.addModifyListener(lsMod);
+        customTextInputForm = new FormData();
+        customTextInputForm.left = new FormAttachment(0, 0);
+        customTextInputForm.right = new FormAttachment(100, 0);
+        customTextInputForm.top = new FormAttachment(customTextLabel, margin);
+        customTextInputForm.bottom = new FormAttachment(customTextLabel, 150);
+        customTextInput.setLayoutData(customTextInputForm);
+
+        //Place all the above into tab item "Text"
+        TabItem text = new TabItem(tabFolder, SWT.NONE);
+        text.setText("Text");
+        text.setToolTipText("This tab controls the text in the message");
+        text.setControl(textComposite);
+
+        Composite attachComposite = new Composite(tabFolder, SWT.NONE);
+        FormLayout attachCompositeLayout = new FormLayout();
+        attachCompositeLayoutForm = new FormData();
+        attachCompositeLayoutForm.left = new FormAttachment(0,0);
+        attachCompositeLayoutForm.right = new FormAttachment(100,0);
+        attachCompositeLayoutForm.top = new FormAttachment(0,margin);
+        attachComposite.setLayout(attachCompositeLayout);
+        attachComposite.setLayoutData(attachCompositeLayoutForm);
+
+        attachLogButton = new Button(attachComposite, SWT.CHECK);
+        attachLogButton.setSelection(false);
+        attachLogButton.setSize(100, attachLogButton.getSize().y);
+        props.setLook(attachLogButton);
+        attachLogButtonForm = new FormData();
+        attachLogButtonForm.left = new FormAttachment(0, 0);
+        attachLogButtonForm.right = new FormAttachment(10, 0);
+        attachLogButtonForm.top = new FormAttachment(0,margin + 2);
+        attachLogButton.setLayoutData(attachLogButtonForm);
+
+        attachLogLabel = new Label(attachComposite, SWT.LEFT);
+        attachLogLabel.setToolTipText("Send a file containing the logs for the current job");
+        attachLogLabel.setText("Attach Complete Log");
+        props.setLook(attachLogLabel);
+        attachLogLabelForm = new FormData();
+        attachLogLabelForm.left = new FormAttachment(10, 0);
+        attachLogLabelForm.right = new FormAttachment(100, 0);
+        attachLogLabelForm.top = new FormAttachment(0, margin + 2);
+        attachLogLabel.setLayoutData(attachLogLabelForm);
+
+        attachErrorButton = new Button(attachComposite, SWT.CHECK);
+        attachErrorButton.setSelection(false);
+        attachErrorButton.setSize(100, attachErrorButton.getSize().y);
+        props.setLook(attachErrorButton);
+        attachErrorButtonForm = new FormData();
+        attachErrorButtonForm.left = new FormAttachment(0, 0);
+        attachErrorButtonForm.right = new FormAttachment(10, 0);
+        attachErrorButtonForm.top = new FormAttachment(attachLogLabel,margin);
+        attachErrorButton.setLayoutData(attachErrorButtonForm);
+
+        attachErrorLabel = new Label(attachComposite, SWT.LEFT);
+        attachErrorLabel.setToolTipText("Send a file containing the job errors");
+        attachErrorLabel.setText("Attach Job Errors");
+        props.setLook(attachErrorLabel);
+        attachErrorLabelForm = new FormData();
+        attachErrorLabelForm.left = new FormAttachment(10, 0);
+        attachErrorLabelForm.right = new FormAttachment(100, 0);
+        attachErrorLabelForm.top = new FormAttachment(attachLogLabel, margin);
+        attachErrorLabel.setLayoutData(attachErrorLabelForm);
+
+        attachWarningsButton = new Button(attachComposite, SWT.CHECK);
+        attachWarningsButton.setSelection(false);
+        attachWarningsButton.setSize(100, attachWarningsButton.getSize().y);
+        props.setLook(attachWarningsButton);
+        attachWarningsButtonForm = new FormData();
+        attachWarningsButtonForm.left = new FormAttachment(0, 0);
+        attachWarningsButtonForm.right = new FormAttachment(10, 0);
+        attachWarningsButtonForm.top = new FormAttachment(attachErrorLabel,margin);
+        attachWarningsButton.setLayoutData(attachWarningsButtonForm);
+
+        attachWarningsLabel = new Label(attachComposite, SWT.LEFT);
+        attachWarningsLabel.setToolTipText("Send a file containing job warnings");
+        attachWarningsLabel.setText("Attach Job Warnings");
+        props.setLook(attachWarningsLabel);
+        attachWarningsLabelForm = new FormData();
+        attachWarningsLabelForm.left = new FormAttachment(10, 0);
+        attachWarningsLabelForm.right = new FormAttachment(100, 0);
+        attachWarningsLabelForm.top = new FormAttachment(attachErrorLabel, margin);
+        attachWarningsLabel.setLayoutData(attachWarningsLabelForm);
+
+        customAttachmentButton = new Button(attachComposite, SWT.CHECK);
+        customAttachmentButton.setSelection(false);
+        customAttachmentButton.setSize(100, customAttachmentButton.getSize().y);
+        props.setLook(customAttachmentButton);
+        customAttachmentButtonForm = new FormData();
+        customAttachmentButtonForm.left = new FormAttachment(0, 0);
+        customAttachmentButtonForm.right = new FormAttachment(10, 0);
+        customAttachmentButtonForm.top = new FormAttachment(attachWarningsLabel,margin);
+        customAttachmentButton.setLayoutData(customAttachmentButtonForm);
+
+        customAttachmentLabel = new Label(attachComposite, SWT.LEFT);
+        customAttachmentLabel.setToolTipText("Send a file you specify below");
+        customAttachmentLabel.setText("Send Custom Attachment");
+        props.setLook(customAttachmentLabel);
+        customAttachmentLabelForm = new FormData();
+        customAttachmentLabelForm.left = new FormAttachment(10, 0);
+        customAttachmentLabelForm.right = new FormAttachment(100, 0);
+        customAttachmentLabelForm.top = new FormAttachment(attachWarningsLabel, margin);
+        customAttachmentLabel.setLayoutData(customAttachmentLabelForm);
+
+        // Separator Line between checkboxes and custom message input
+        Label separator3 = new Label(attachComposite, SWT.HORIZONTAL | SWT.SEPARATOR);
+        FormData fdSeparator3 = new FormData();
+        fdSeparator3.left = new FormAttachment(0, margin);
+        fdSeparator3.top = new FormAttachment(customAttachmentLabel, margin);
+        fdSeparator3.right = new FormAttachment(100, 0);
+        separator3.setLayoutData(fdSeparator3);
+        props.setLook(separator3);
+
+        customAttachLabel = new Label(attachComposite, SWT.LEFT);
+        customAttachLabel.setText("Custom Attachments:");
+        props.setLook(customAttachLabel);
+        customAttachLabelForm = new FormData();
+        customAttachLabelForm.left = new FormAttachment(0, 0);
+        customAttachLabelForm.right = new FormAttachment(100,0);
+        customAttachLabelForm.top = new FormAttachment(separator3, margin);
+        customAttachLabel.setLayoutData(customAttachLabelForm);
+
+        TabItem attachment = new TabItem(tabFolder, SWT.NONE);
+        attachment.setText("Attachments");
+        attachment.setToolTipText("This tab allows you to upload files via Slack");
+        attachment.setControl(attachComposite);
+
+
+
 
         Button wOK = new Button(shell, SWT.PUSH);
         wOK.setText(BaseMessages.getString(PKG, "System.Button.OK"));
@@ -235,7 +652,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         meta.setChanged(changed);
 
         // restore dialog size and placement, or set default size if none saved yet
-        BaseStepDialog.setSize(shell, 250, 140, false);
+        BaseStepDialog.setSize(shell, 100, 140, false);
 
         // open dialog and enter event loop
         shell.open();
