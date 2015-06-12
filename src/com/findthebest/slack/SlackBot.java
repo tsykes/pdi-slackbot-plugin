@@ -41,6 +41,8 @@ import org.pentaho.di.repository.Repository;
 import org.pentaho.metastore.api.IMetaStore;
 import org.w3c.dom.Node;
 
+import com.findthebest.slack.SlackConnection;
+
 /**
  * This defines a 'create folder' job entry. Its main use would be to create empty folder that can be used to control
  * the flow in ETL cycles.
@@ -203,12 +205,23 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
      * rows or files attached to the result object if required.
      *
      * @param prev_result The result of the previous execution
+     * @param nr Distance of job entry from start entry job
      * @return The Result of the execution.
      */
     public Result execute(Result prev_result, int nr){
+        int errors = 0;
+        outcome = true;
+        try {
+            SlackConnection slack = new SlackConnection();
+            slack.postToSlack("C061NB8LD", "Testing...");
+        } catch (Exception e) {
+            logBasic(e.getMessage());
+            errors++;
+            outcome = false;
+        }
 
         // indicate there are no errors
-        prev_result.setNrErrors(0);
+        prev_result.setNrErrors(errors);
         // indicate the result as configured
         prev_result.setResult(outcome);
         return prev_result;
