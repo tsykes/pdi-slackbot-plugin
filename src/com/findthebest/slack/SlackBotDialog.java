@@ -98,7 +98,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
     // output field name
     private TextVar emailInput, passwordInput, appIDInput,
-            listDelimiterInput, customTextInput;
+            listDelimiterInput, customTextInput, channelInput;
 
     private Label emailLabel, passwordLabel, channelUpdateButtonLabel,
             appIDLabel, dataFieldLabel, listDelimiterLabel, insertNoMatchLabel,
@@ -124,7 +124,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
     private GridData channelLabelGrid, channelInputGrid, directInputGrid, directLabelGrid, privateLabelGrid, privateInputGrid,
             tokenLabelGrid, tokenVerifyGrid;
     private String[] incoming_fields = null;
-    private Combo field_options, channelInput, directInput, privateInput;
+    private Combo field_options, directInput, privateInput;
     private Button insertNoMatchButton, updateExistingButton, updateByIDButton,
             doNotReplaceButton, wipeTableButton, deleteUnchangedButton,
             emailOnSuccessButton, channelUpdateButton, textButton, attachmentButton, standardSuccessButton, standardFailureButton,
@@ -240,7 +240,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
         /*
          * channel update button
-         */
+
         channelUpdateButtonLabel = new Label(shell, SWT.RIGHT);
         channelUpdateButtonLabel.setText("Update Channel List");
         channelUpdateButtonLabel
@@ -259,7 +259,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         channelUpdateButtonForm.right = new FormAttachment(80, 0);
         channelUpdateButtonForm.top = new FormAttachment(separator1, margin - 2);
         channelUpdateButton.setLayoutData(channelUpdateButtonForm);
-
+        */
 
         /*
          * Recipient Group
@@ -271,7 +271,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         recipientGroupForm = new FormData();
         recipientGroupForm.left = new FormAttachment(0, 0);
         recipientGroupForm.right = new FormAttachment(100, 0);
-        recipientGroupForm.top = new FormAttachment(channelUpdateButtonLabel, margin * 2);
+        recipientGroupForm.top = new FormAttachment(separator1, margin * 2);
         GridLayout recipientGrid = new GridLayout();
         recipientGrid.numColumns = 2;
         recipientGroup.setLayout(recipientGrid);
@@ -286,8 +286,9 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         channelLabel.setLayoutData(channelLabelGrid);
 
         //Fill in Drop Down Box
-        channelInput = new Combo(recipientGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
+        channelInput = new TextVar(jobMeta,recipientGroup, SWT.SINGLE | SWT.LEFT);
         props.setLook(channelInput);
+        channelInput.addModifyListener(lsMod);
         channelInputGrid = new GridData();
         channelInputGrid.horizontalAlignment = GridData.FILL;
         channelInputGrid.grabExcessHorizontalSpace = true;
@@ -375,6 +376,20 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         customMessageButtonForm.right = new FormAttachment(10, 0);
         customMessageButtonForm.top = new FormAttachment(standardFailureLabel,margin);
         customMessageButton.setLayoutData(customMessageButtonForm);
+
+        /*final int customMessage = new int;
+
+        Listener customListener = new Listener(){
+            public void handleEvent(Event event){
+
+                if(event.widget == customMessageButton) {
+                    customMessage = 1;
+                }
+                else{
+                    customMessage = 0;
+                }
+            }
+        }*/
 
         customMessageLabel = new Label(contentGroup, SWT.LEFT);
         customMessageLabel.setToolTipText("Send a customized message you write below");
