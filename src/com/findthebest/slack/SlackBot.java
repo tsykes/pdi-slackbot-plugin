@@ -254,7 +254,8 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
             } else {
                 msg = customText;
             }
-            slack.postToSlack(selectedChannel, msg);
+            logBasic("Sending to slack");
+            logBasic(slack.postToSlack(selectedChannel, msg));
         } catch (Exception e) {
             logBasic(e.getMessage());
             errors++;

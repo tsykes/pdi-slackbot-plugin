@@ -1,7 +1,7 @@
 package com.findthebest.slack;
 
-import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
+//import com.google.gson.Gson;
+//import com.google.gson.internal.LinkedTreeMap;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -25,7 +25,7 @@ public class SlackConnection {
      * Instance Variables
      */
 
-    private Gson gson = new Gson();
+//    private Gson gson = new Gson();
     private int OK = 200;
     private String baseAuthUrl = "https://slack.com/api/auth.test?token=";
     private StringBuilder baseMessageUrl = new StringBuilder("https://slack.com/api/chat.postMessage?");
@@ -66,9 +66,10 @@ public class SlackConnection {
                 LOGGER.config("Setting auth status");
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(con.getInputStream()));
-                LinkedTreeMap result = gson.fromJson(in, LinkedTreeMap.class);
-                String status = result.get("ok").toString();
-                authStatus = status.equals("true");
+//                LinkedTreeMap result = gson.fromJson(in, LinkedTreeMap.class);
+//                String status = result.get("ok").toString();
+//                authStatus = status.equals("true");
+                authStatus = true;
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -125,7 +126,8 @@ public class SlackConnection {
     }
 
 
-    public void postToSlack(String channel, String message) throws IOException {
+    public String postToSlack(String channel, String message) throws IOException {
+        String response = "none";
         if (authStatus) {
             LOGGER.config("Building GET request");
             LinkedHashMap<String,String> params = new LinkedHashMap<String, String>();
@@ -141,11 +143,12 @@ public class SlackConnection {
             baseMessageUrl.deleteCharAt(baseMessageUrl.length() - 1);
             LOGGER.config("Sending GET request");
             HttpsURLConnection con = sendGetRequest(new URL(baseMessageUrl.toString()));
-            String response = extractResponse(con);
+            response = extractResponse(con);
             LOGGER.config(response);
         } else {
             LOGGER.severe("Client not authed");
         }
+        return response;
     }
 
     public void getRoomList(int type) throws InputMismatchException, IOException {
@@ -177,7 +180,7 @@ public class SlackConnection {
     public static void main(String[] args) throws IOException, InputMismatchException {
         SlackConnection slack = new SlackConnection();
         slack.postToSlack("C061NB8LD", "Test");
-        slack.getRoomList(SlackConnection.GROUP);
+//        slack.getRoomList(SlackConnection.GROUP);
     }
 
 }
