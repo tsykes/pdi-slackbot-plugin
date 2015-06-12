@@ -121,7 +121,8 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
             updateByIDInputForm, doNotReplaceInputForm, wipeTableInputForm,
             deleteUnchangedInputForm, fields, emailOnSuccessInputForm, customTextInputForm,
             attachLogButtonForm, attachErrorButtonForm, attachWarningsButtonForm, customAttachmentButtonForm, tabFolderForm;
-    private GridData channelLabelGrid, channelInputGrid, directInputGrid, directLabelGrid, privateLabelGrid, privateInputGrid;
+    private GridData channelLabelGrid, channelInputGrid, directInputGrid, directLabelGrid, privateLabelGrid, privateInputGrid,
+            tokenLabelGrid, tokenVerifyGrid;
     private String[] incoming_fields = null;
     private Combo field_options, channelInput, directInput, privateInput;
     private Button insertNoMatchButton, updateExistingButton, updateByIDButton,
@@ -203,7 +204,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         formLayout.marginHeight = Const.FORM_MARGIN;
 
         shell.setLayout(formLayout);
-        shell.setSize(120,220);
+        shell.setSize(120,110);
         shell.setText("Slack Messages " + SlackBotDialog.STEP_VERSION);
 
         int middle = props.getMiddlePct();
@@ -230,6 +231,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         wName.setLayoutData(fdName);
 
         // Outcome
+        /*
         Label wlOutcome = new Label(shell, SWT.RIGHT);
         wlOutcome.setText(BaseMessages.getString(PKG, "SlackBot.Outcome.Label"));
         props.setLook(wlOutcome);
@@ -250,28 +252,76 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         fdOutcome.right = new FormAttachment(100, 0);
         //fdOutcome.bottom = new FormAttachment(100, -40);
         wOutcome.setLayoutData(fdOutcome);
+        */
 
 
         // Separator Line
         Label separator1 = new Label(shell, SWT.HORIZONTAL | SWT.SEPARATOR);
         FormData fdSeparator1 = new FormData();
         fdSeparator1.left = new FormAttachment(0, margin);
-        fdSeparator1.top = new FormAttachment(wlOutcome, margin);
+        fdSeparator1.top = new FormAttachment(wlName, margin*3);
         fdSeparator1.right = new FormAttachment(100, 0);
         separator1.setLayoutData(fdSeparator1);
         props.setLook(separator1);
 
         // tokenInputForm
         tokenLabel = new Label(shell, SWT.RIGHT);
-        tokenLabel.setText("Slack Token: ");
+        tokenLabel.setText("Update Channel List");
         tokenLabel
-                .setToolTipText("Required if sending a direct message, or sending a message to a private group.");
+                .setToolTipText("Update the list of channels available");
         props.setLook(tokenLabel);
         tokenLabelForm = new FormData();
         tokenLabelForm.left = new FormAttachment(0, 0);
         tokenLabelForm.right = new FormAttachment(middle, -margin);
-        tokenLabelForm.top = new FormAttachment(separator1, margin);
+        tokenLabelForm.top = new FormAttachment(separator1, margin*3);
         tokenLabel.setLayoutData(tokenLabelForm);
+
+        /*tokenInput = new TextVar(jobMeta, shell, SWT.PASSWORD | SWT.SINGLE
+                | SWT.LEFT | SWT.BORDER);
+        props.setLook(tokenLabel);
+        tokenInput.addModifyListener(lsMod);
+        tokenInputForm = new FormData();
+        tokenInputForm.left = new FormAttachment(middle, 0);
+        tokenInputForm.right = new FormAttachment(75, 0);
+        tokenInputForm.top = new FormAttachment(separator1, margin);
+        tokenInput.setLayoutData(tokenInputForm);*/
+
+        tokenVerify = new Button(shell,SWT.PUSH);
+        tokenVerify.setText("Update");
+        tokenVerifyForm = new FormData();
+        tokenVerifyForm.left = new FormAttachment(middle, 10);
+        tokenVerifyForm.right = new FormAttachment(80, 0);
+        tokenVerifyForm.top = new FormAttachment(separator1, margin - 2);
+        tokenVerify.setLayoutData(tokenVerifyForm);
+
+
+        //Recipient Group
+
+        recipientGroup = new Group(shell,SWT.SHADOW_NONE);
+        recipientGroup.setText("To Whom?");
+        props.setLook(recipientGroup);
+        recipientGroupForm = new FormData();
+        recipientGroupForm.left = new FormAttachment(0, 0);
+        recipientGroupForm.right = new FormAttachment(100, 0);
+        recipientGroupForm.top = new FormAttachment(tokenLabel, margin * 2);
+        GridLayout recipientGrid = new GridLayout();
+        recipientGrid.numColumns = 2;
+        recipientGroup.setLayout(recipientGrid);
+        recipientGroup.setLayoutData(recipientGroupForm);
+
+
+        // tokenInputForm
+        /*
+        tokenLabel = new Label(shell, SWT.RIGHT);
+        tokenLabel.setText("Update Channel List");
+        tokenLabel
+                .setToolTipText("Update the list of channels available");
+        props.setLook(tokenLabel);
+        tokenLabelGrid = new GridData();
+        tokenLabelGrid.horizontalAlignment = GridData.FILL;
+        tokenLabelGrid.grabExcessHorizontalSpace = true;
+        tokenLabel.setLayoutData(tokenLabelGrid);
+
 
         tokenInput = new TextVar(jobMeta, shell, SWT.PASSWORD | SWT.SINGLE
                 | SWT.LEFT | SWT.BORDER);
@@ -283,28 +333,14 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         tokenInputForm.top = new FormAttachment(separator1, margin);
         tokenInput.setLayoutData(tokenInputForm);
 
+
         tokenVerify = new Button(shell,SWT.PUSH);
-        tokenVerify.setText("Verify");
-        tokenVerify.setToolTipText("Verify the Slack token");
-        tokenVerifyForm = new FormData();
-        tokenVerifyForm.left = new FormAttachment(75, 10);
-        tokenVerifyForm.right = new FormAttachment(100, 0);
-        tokenVerifyForm.top = new FormAttachment(separator1, margin - 2);
-        tokenVerify.setLayoutData(tokenVerifyForm);
-
-        //Recipient Group
-
-        recipientGroup = new Group(shell,SWT.SHADOW_NONE);
-        recipientGroup.setText("To Whom?");
-        props.setLook(recipientGroup);
-        recipientGroupForm = new FormData();
-        recipientGroupForm.left = new FormAttachment(0, 0);
-        recipientGroupForm.right = new FormAttachment(100, 0);
-        recipientGroupForm.top = new FormAttachment(tokenInput, margin * 2);
-        GridLayout recipientGrid = new GridLayout();
-        recipientGrid.numColumns = 2;
-        recipientGroup.setLayout(recipientGrid);
-        recipientGroup.setLayoutData(recipientGroupForm);
+        tokenVerify.setText("Update");
+        tokenVerifyGrid = new GridData();
+        tokenVerifyGrid.horizontalAlignment = GridData.FILL;
+        tokenVerifyGrid.grabExcessHorizontalSpace = true;
+        tokenVerify.setLayoutData(tokenVerifyGrid);
+        */
 
         channelLabel = new Label(recipientGroup, SWT.RIGHT);
         channelLabel.setText("Channel:");
@@ -322,7 +358,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         channelInputGrid.grabExcessHorizontalSpace = true;
         channelInput.setLayoutData(channelLabelGrid);
 
-        directLabel = new Label(recipientGroup, SWT.RIGHT);
+        /*directLabel = new Label(recipientGroup, SWT.RIGHT);
         directLabel.setText("Direct Message:");
         directLabel.setToolTipText("The name of contact, preceded by '@'");
         directLabelGrid = new GridData();
@@ -353,6 +389,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         privateInputGrid.horizontalAlignment = GridData.FILL;
         privateInputGrid.grabExcessHorizontalSpace = true;
         privateInput.setLayoutData(privateLabelGrid);
+        */
 
         contentGroup = new Group(shell,SWT.SHADOW_NONE);
         contentGroup.setText("What to Send?");
@@ -364,6 +401,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         FormLayout contentLayout = new FormLayout();
         contentGroup.setLayout(contentLayout);
         contentGroup.setLayoutData(contentGroupForm);
+
 
         tabFolder = new TabFolder(contentGroup, SWT.NONE);
         FormData tabFolderForm = new FormData();
@@ -382,7 +420,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         textComposite.setLayout(textCompositeLayout);
         textComposite.setLayoutData(textCompositeLayoutForm);
 
-        standardSuccessButton = new Button(textComposite, SWT.CHECK);
+        standardSuccessButton = new Button(textComposite, SWT.RADIO);
         standardSuccessButton.setSelection(false);
         standardSuccessButton.setSize(100, standardSuccessButton.getSize().y);
         props.setLook(standardSuccessButton);
@@ -402,7 +440,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         standardSuccessLabelForm.top = new FormAttachment(0, margin + 2);
         standardSuccessLabel.setLayoutData(standardSuccessLabelForm);
 
-        standardFailureButton = new Button(textComposite, SWT.CHECK);
+        standardFailureButton = new Button(textComposite, SWT.RADIO);
         standardFailureButton.setSelection(true);
         standardFailureButton.setSize(100, standardFailureButton.getSize().y);
         props.setLook(standardFailureButton);
@@ -422,7 +460,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         standardFailureLabelForm.top = new FormAttachment(standardSuccessLabel, margin);
         standardFailureLabel.setLayoutData(standardFailureLabelForm);
 
-        errorLineButton = new Button(textComposite, SWT.CHECK);
+        /*errorLineButton = new Button(textComposite, SWT.RADIO);
         errorLineButton.setSelection(false);
         errorLineButton.setSize(100, errorLineButton.getSize().y);
         props.setLook(errorLineButton);
@@ -440,16 +478,16 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         errorLineLabelForm.left = new FormAttachment(10, 0);
         errorLineLabelForm.right = new FormAttachment(100, 0);
         errorLineLabelForm.top = new FormAttachment(standardFailureLabel, margin);
-        errorLineLabel.setLayoutData(errorLineLabelForm);
+        errorLineLabel.setLayoutData(errorLineLabelForm);*/
 
-        customMessageButton = new Button(textComposite, SWT.CHECK);
+        customMessageButton = new Button(textComposite, SWT.RADIO);
         customMessageButton.setSelection(false);
         customMessageButton.setSize(100, customMessageButton.getSize().y);
         props.setLook(customMessageButton);
         customMessageButtonForm = new FormData();
         customMessageButtonForm.left = new FormAttachment(0, 0);
         customMessageButtonForm.right = new FormAttachment(10, 0);
-        customMessageButtonForm.top = new FormAttachment(errorLineLabel,margin);
+        customMessageButtonForm.top = new FormAttachment(standardFailureLabel,margin);
         customMessageButton.setLayoutData(customMessageButtonForm);
 
         customMessageLabel = new Label(textComposite, SWT.LEFT);
@@ -459,7 +497,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         customMessageLabelForm = new FormData();
         customMessageLabelForm.left = new FormAttachment(10, 0);
         customMessageLabelForm.right = new FormAttachment(100, 0);
-        customMessageLabelForm.top = new FormAttachment(errorLineLabel, margin);
+        customMessageLabelForm.top = new FormAttachment(standardFailureLabel, margin);
         customMessageLabel.setLayoutData(customMessageLabelForm);
 
         // Separator Line between checkboxes and custom message input
@@ -496,7 +534,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         text.setToolTipText("This tab controls the text in the message");
         text.setControl(textComposite);
 
-        Composite attachComposite = new Composite(tabFolder, SWT.NONE);
+        /*Composite attachComposite = new Composite(tabFolder, SWT.NONE);
         FormLayout attachCompositeLayout = new FormLayout();
         attachCompositeLayoutForm = new FormData();
         attachCompositeLayoutForm.left = new FormAttachment(0,0);
@@ -505,7 +543,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         attachComposite.setLayout(attachCompositeLayout);
         attachComposite.setLayoutData(attachCompositeLayoutForm);
 
-        attachLogButton = new Button(attachComposite, SWT.CHECK);
+        attachLogButton = new Button(attachComposite, SWT.RADIO);
         attachLogButton.setSelection(false);
         attachLogButton.setSize(100, attachLogButton.getSize().y);
         props.setLook(attachLogButton);
@@ -525,7 +563,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         attachLogLabelForm.top = new FormAttachment(0, margin + 2);
         attachLogLabel.setLayoutData(attachLogLabelForm);
 
-        attachErrorButton = new Button(attachComposite, SWT.CHECK);
+        attachErrorButton = new Button(attachComposite, SWT.RADIO);
         attachErrorButton.setSelection(false);
         attachErrorButton.setSize(100, attachErrorButton.getSize().y);
         props.setLook(attachErrorButton);
@@ -545,7 +583,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         attachErrorLabelForm.top = new FormAttachment(attachLogLabel, margin);
         attachErrorLabel.setLayoutData(attachErrorLabelForm);
 
-        attachWarningsButton = new Button(attachComposite, SWT.CHECK);
+        attachWarningsButton = new Button(attachComposite, SWT.RADIO);
         attachWarningsButton.setSelection(false);
         attachWarningsButton.setSize(100, attachWarningsButton.getSize().y);
         props.setLook(attachWarningsButton);
@@ -565,7 +603,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         attachWarningsLabelForm.top = new FormAttachment(attachErrorLabel, margin);
         attachWarningsLabel.setLayoutData(attachWarningsLabelForm);
 
-        customAttachmentButton = new Button(attachComposite, SWT.CHECK);
+        customAttachmentButton = new Button(attachComposite, SWT.RADIO);
         customAttachmentButton.setSelection(false);
         customAttachmentButton.setSize(100, customAttachmentButton.getSize().y);
         props.setLook(customAttachmentButton);
@@ -606,7 +644,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         TabItem attachment = new TabItem(tabFolder, SWT.NONE);
         attachment.setText("Attachments");
         attachment.setToolTipText("This tab allows you to upload files via Slack");
-        attachment.setControl(attachComposite);
+        attachment.setControl(attachComposite);*/
 
 
 
@@ -652,8 +690,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         meta.setChanged(changed);
 
         // restore dialog size and placement, or set default size if none saved yet
-        BaseStepDialog.setSize(shell, 100, 140, false);
-
+        BaseStepDialog.setSize(shell, 100, 130, false);
         // open dialog and enter event loop
         shell.open();
         while (!shell.isDisposed()){
@@ -689,7 +726,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         wName.selectAll();
 
         // choosing the configured value for the outcome on the selector box
-        wOutcome.select(meta.getOutcome()?0:1);
+        //wOutcome.select(meta.getOutcome()?0:1);
 
     }
 
