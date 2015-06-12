@@ -2,7 +2,6 @@ package com.findthebest.slack;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -35,6 +34,9 @@ public class SlackConnection {
     private String token;
     private final static Logger LOGGER = Logger.getLogger(SlackConnection.class.getName());
     private final static int CHANNEL = 1, GROUP = 2, DM = 3;
+    private final String propertiesFile = "com/findthebest/slack/resources/config.properties";
+    Properties properties;
+
 
 
      
@@ -43,12 +45,17 @@ public class SlackConnection {
      */
 
     public SlackConnection() throws IOException {
-        this(getToken("com/findthebest/slack/resources/config.properties"));
+        this(null);
     }
 
-    public SlackConnection(String token) {
+    public SlackConnection(String token) throws FileNotFoundException {
+        this(token, false);
+    }
+
+    public SlackConnection(String passedToken, Boolean debug) throws FileNotFoundException {
+        properties = loadProperties(propertiesFile);
+        token = passedToken == null ? properties.getProperty("defaultToken") : passedToken;
         configLogger(Level.CONFIG);
-        this.token = token;
         String authUrlString = baseAuthUrl + token;
         try {
             LOGGER.config("Attempting to Auth");
@@ -76,6 +83,7 @@ public class SlackConnection {
      */
 
     private void configLogger(Level logLevel) {
+
         LOGGER.setLevel(logLevel);
         ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleFormatter());
@@ -83,20 +91,20 @@ public class SlackConnection {
         LOGGER.addHandler(handler);
     }
 
-    private static String getToken(String configFile) throws FileNotFoundException {
-        InputStream in = SlackConnection.class.getClassLoader().getResourceAsStream(configFile);
+    private static Properties loadProperties(String propFile) throws FileNotFoundException {
+        InputStream in = SlackConnection.class.getClassLoader().getResourceAsStream(propFile);
         Properties properties = new Properties();
         try {
             if (in != null) {
                 properties.load(in);
             } else {
-                throw new FileNotFoundException(String.format("property file %s not found in classpath", configFile));
+                throw new FileNotFoundException(String.format("property file %s not found in classpath", propFile));
             }
 
         } catch (IOException e) {
             throw new FileNotFoundException();
         }
-        return properties.getProperty("defaultToken");
+        return properties;
     }
 
     private HttpsURLConnection sendGetRequest(URL url) throws IOException {
