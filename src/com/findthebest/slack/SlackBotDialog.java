@@ -309,15 +309,15 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         contentGroup.setLayoutData(contentGroupForm);
 
 
-        tabFolder = new TabFolder(contentGroup, SWT.NONE);
+        /*tabFolder = new TabFolder(contentGroup, SWT.NONE);
         FormData tabFolderForm = new FormData();
         tabFolderForm.left = new FormAttachment(0,0);
         tabFolderForm.right = new FormAttachment(100,0);
         tabFolderForm.top = new FormAttachment(0,margin);
         tabFolder.setLayoutData(tabFolderForm);
+        */
 
-
-        Composite textComposite = new Composite(tabFolder, SWT.NONE);
+        Composite textComposite = new Composite(contentGroup, SWT.NONE);
         FormLayout textCompositeLayout = new FormLayout();
         textCompositeLayoutForm = new FormData();
         textCompositeLayoutForm.left = new FormAttachment(0,0);
@@ -326,7 +326,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         textComposite.setLayout(textCompositeLayout);
         textComposite.setLayoutData(textCompositeLayoutForm);
 
-        standardSuccessButton = new Button(textComposite, SWT.RADIO);
+        standardSuccessButton = new Button(contentGroup, SWT.RADIO);
         standardSuccessButton.setSelection(false);
         standardSuccessButton.setSize(100, standardSuccessButton.getSize().y);
         props.setLook(standardSuccessButton);
@@ -336,7 +336,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         standardSuccessButtonForm.top = new FormAttachment(0,margin + 2);
         standardSuccessButton.setLayoutData(standardSuccessButtonForm);
 
-        standardSuccessLabel = new Label(textComposite, SWT.LEFT);
+        standardSuccessLabel = new Label(contentGroup, SWT.LEFT);
         standardSuccessLabel.setToolTipText("Send a templated success messages indicating the job has run successfully");
         standardSuccessLabel.setText("Send Standard Success Message");
         props.setLook(standardSuccessLabel);
@@ -346,7 +346,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         standardSuccessLabelForm.top = new FormAttachment(0, margin + 2);
         standardSuccessLabel.setLayoutData(standardSuccessLabelForm);
 
-        standardFailureButton = new Button(textComposite, SWT.RADIO);
+        standardFailureButton = new Button(contentGroup, SWT.RADIO);
         standardFailureButton.setSelection(true);
         standardFailureButton.setSize(100, standardFailureButton.getSize().y);
         props.setLook(standardFailureButton);
@@ -356,7 +356,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         standardFailureButtonForm.top = new FormAttachment(standardSuccessLabel,margin);
         standardFailureButton.setLayoutData(standardFailureButtonForm);
 
-        standardFailureLabel = new Label(textComposite, SWT.LEFT);
+        standardFailureLabel = new Label(contentGroup, SWT.LEFT);
         standardFailureLabel.setToolTipText("Send a templated failure messages indicating the job has not run successfully");
         standardFailureLabel.setText("Send Standard Failure Message");
         props.setLook(standardFailureLabel);
@@ -366,7 +366,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         standardFailureLabelForm.top = new FormAttachment(standardSuccessLabel, margin);
         standardFailureLabel.setLayoutData(standardFailureLabelForm);
 
-        customMessageButton = new Button(textComposite, SWT.RADIO);
+        customMessageButton = new Button(contentGroup, SWT.RADIO);
         customMessageButton.setSelection(false);
         customMessageButton.setSize(100, customMessageButton.getSize().y);
         props.setLook(customMessageButton);
@@ -376,7 +376,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         customMessageButtonForm.top = new FormAttachment(standardFailureLabel,margin);
         customMessageButton.setLayoutData(customMessageButtonForm);
 
-        customMessageLabel = new Label(textComposite, SWT.LEFT);
+        customMessageLabel = new Label(contentGroup, SWT.LEFT);
         customMessageLabel.setToolTipText("Send a customized message you write below");
         customMessageLabel.setText("Send Custom Message");
         props.setLook(customMessageLabel);
@@ -387,7 +387,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         customMessageLabel.setLayoutData(customMessageLabelForm);
 
         // Separator Line between checkboxes and custom message input
-        Label separator2 = new Label(textComposite, SWT.HORIZONTAL | SWT.SEPARATOR);
+        Label separator2 = new Label(contentGroup, SWT.HORIZONTAL | SWT.SEPARATOR);
         FormData fdSeparator2 = new FormData();
         fdSeparator2.left = new FormAttachment(0, margin);
         fdSeparator2.top = new FormAttachment(customMessageLabel, margin);
@@ -395,7 +395,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         separator2.setLayoutData(fdSeparator2);
         props.setLook(separator2);
 
-        customTextLabel = new Label(textComposite, SWT.LEFT);
+        customTextLabel = new Label(contentGroup, SWT.LEFT);
         customTextLabel.setText("Input Custom Text Here:");
         props.setLook(customTextLabel);
         customTextLabelForm = new FormData();
@@ -404,7 +404,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         customTextLabelForm.top = new FormAttachment(separator2, margin);
         customTextLabel.setLayoutData(customTextLabelForm);
 
-        customTextInput = new TextVar(jobMeta,textComposite , SWT.MULTI | SWT.LEFT | SWT.WRAP);
+        customTextInput = new TextVar(jobMeta,contentGroup , SWT.MULTI | SWT.LEFT | SWT.WRAP);
         props.setLook(customTextInput);
         customTextInput.addModifyListener(lsMod);
         customTextInputForm = new FormData();
@@ -414,11 +414,11 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         customTextInputForm.bottom = new FormAttachment(customTextLabel, 150);
         customTextInput.setLayoutData(customTextInputForm);
 
-        //Place all the above into tab item "Text"
+        /*//Place all the above into tab item "Text"
         TabItem text = new TabItem(tabFolder, SWT.NONE);
         text.setText("Text");
         text.setToolTipText("This tab controls the text in the message");
-        text.setControl(textComposite);
+        text.setControl(textComposite);*/
 
         /*
          * Ok and Cancel buttons
