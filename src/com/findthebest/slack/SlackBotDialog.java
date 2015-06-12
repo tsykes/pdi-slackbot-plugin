@@ -513,6 +513,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         // setting the name of the job entry
         if (meta.getName() != null){
             wName.setText(meta.getName());
+            channelInput.setText(meta.getSelectedChannel());
             standardSuccessButton.setSelection(meta.isSuccessMsg());
             standardFailureButton.setSelection(meta.isFailureMsg());
             customMessageButton.setSelection(meta.isCustomMsg());
@@ -555,6 +556,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
         // update the meta object with the entered dialog settings
         meta.setName(wName.getText());
+        meta.setSelectedChannel(channelInput.getText());
         meta.setSuccessMsg(standardSuccessButton.getSelection());
         meta.setFailureMsg(standardFailureButton.getSelection());
         meta.setCustomMsg(customMessageButton.getSelection());
