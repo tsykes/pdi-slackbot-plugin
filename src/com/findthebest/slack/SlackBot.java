@@ -142,9 +142,10 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
 
         retval.append(super.getXML());
         retval.append("      ").append(XMLHandler.addTagValue("selectedChannel", selectedChannel));
-        retval.append("      ").append(XMLHandler.addTagValue("customText", customMsg));
+        retval.append("      ").append(XMLHandler.addTagValue("customMsg", customMsg));
         retval.append("      ").append(XMLHandler.addTagValue("successMsg", successMsg));
         retval.append("      ").append(XMLHandler.addTagValue("failureMsg", failureMsg));
+        retval.append("      ").append(XMLHandler.addTagValue("customText", customText));
         retval.append("      <channels>" + Const.CR);
         for (String channel : channelList) {
             retval.append("        ").append(XMLHandler.addTagValue("channel", channel));

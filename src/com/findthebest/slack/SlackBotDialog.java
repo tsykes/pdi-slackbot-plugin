@@ -517,6 +517,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
             standardSuccessButton.setSelection(meta.isSuccessMsg());
             standardFailureButton.setSelection(meta.isFailureMsg());
             customMessageButton.setSelection(meta.isCustomMsg());
+            customTextInput.setText(meta.getCustomText());
         }
         wName.selectAll();
 
@@ -560,7 +561,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         meta.setSuccessMsg(standardSuccessButton.getSelection());
         meta.setFailureMsg(standardFailureButton.getSelection());
         meta.setCustomMsg(customMessageButton.getSelection());
-//        meta.setCustomText();
+        meta.setCustomText(customTextInput.getText());
 
         // close dialog window and clean up
         dispose();
