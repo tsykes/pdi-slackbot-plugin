@@ -323,12 +323,17 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
         this.customMsg = customMsg;
     }
 
-    public LinkedList<String> getChannelList() {
-        return channelList;
+    public String[] getChannelList() {
+//        return channelList.toArray(new String[channelList.size()]);
+        String[] l = {"a", "b", "c"};
+        return l;
     }
 
-    public void setChannelList(LinkedList<String> channelList) {
-        this.channelList = channelList;
+    public void setChannelList(String[] currentList) {
+        channelList.clear();
+        for (String channel : currentList) {
+            channelList.add(channel);
+        }
     }
 
 }
