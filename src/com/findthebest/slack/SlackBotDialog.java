@@ -97,7 +97,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
     private CCombo wOutcome;
 
     // output field name
-    private TextVar emailInput, passwordInput, tokenInput, appIDInput,
+    private TextVar emailInput, passwordInput, appIDInput,
             listDelimiterInput, customTextInput;
 
     private Label emailLabel, passwordLabel, channelUpdateButtonLabel,
@@ -204,7 +204,6 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         formLayout.marginHeight = Const.FORM_MARGIN;
 
         shell.setLayout(formLayout);
-        shell.setSize(120,110);
         shell.setText("Slack Messages " + SlackBotDialog.STEP_VERSION);
 
         int middle = props.getMiddlePct();
@@ -214,7 +213,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
         // Job entry name line
         Label wlName = new Label(shell, SWT.RIGHT);
-        wlName.setText(BaseMessages.getString(PKG, "SlackBot.JobEntryName.Label"));
+        wlName.setText("Step Name: ");
         props.setLook(wlName);
         FormData fdlName = new FormData();
         fdlName.left = new FormAttachment(0, 0);
@@ -466,7 +465,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         meta.setChanged(changed);
 
         // restore dialog size and placement, or set default size if none saved yet
-        BaseStepDialog.setSize(shell, 100, 130, false);
+        BaseStepDialog.setSize(shell, 100, 100, false);
         // open dialog and enter event loop
         shell.open();
         while (!shell.isDisposed()){
