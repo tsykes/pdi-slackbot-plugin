@@ -1,17 +1,14 @@
 package com.findthebest.slack;
 
-//import com.google.gson.Gson;
-//import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.*;
+import com.google.gson.internal.LinkedTreeMap;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.InputMismatchException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +22,7 @@ public class SlackConnection {
      * Instance Variables
      */
 
-//    private Gson gson = new Gson();
+    private Gson gson;
     private int OK = 200;
     private String baseAuthUrl = "https://slack.com/api/auth.test?token=";
     private StringBuilder baseMessageUrl = new StringBuilder("https://slack.com/api/chat.postMessage?");
@@ -33,7 +30,7 @@ public class SlackConnection {
     private Boolean authStatus;
     private String token;
     private final static Logger LOGGER = Logger.getLogger(SlackConnection.class.getName());
-    private final static int CHANNEL = 1, GROUP = 2, DM = 3;
+    public final static int CHANNEL = 1, GROUP = 2, DM = 3;
     private final String propertiesFile = "com/findthebest/slack/resources/config.properties";
     Properties properties;
 
@@ -48,16 +45,17 @@ public class SlackConnection {
         this(null);
     }
 
-    public SlackConnection(String token) throws FileNotFoundException {
+    public SlackConnection(String token) {
         this(token, false);
     }
 
-    public SlackConnection(String passedToken, Boolean debug) throws FileNotFoundException {
-        properties = loadProperties(propertiesFile);
-        token = passedToken == null ? properties.getProperty("defaultToken") : passedToken;
-        configLogger(Level.CONFIG);
-        String authUrlString = baseAuthUrl + token;
+    public SlackConnection(String passedToken, Boolean debug) {
         try {
+            gson = new Gson();
+            properties = loadProperties(propertiesFile);
+            token = passedToken == null ? properties.getProperty("defaultToken") : passedToken;
+            configLogger(Level.CONFIG);
+            String authUrlString = baseAuthUrl + token;
             LOGGER.config("Attempting to Auth");
             HttpsURLConnection con = sendGetRequest(new URL(authUrlString));
             LOGGER.config("Checking response code");
@@ -66,12 +64,14 @@ public class SlackConnection {
                 LOGGER.config("Setting auth status");
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(con.getInputStream()));
-//                LinkedTreeMap result = gson.fromJson(in, LinkedTreeMap.class);
-//                String status = result.get("ok").toString();
-//                authStatus = status.equals("true");
+                LinkedTreeMap result = gson.fromJson(in, LinkedTreeMap.class);
+                String status = result.get("ok").toString();
+                authStatus = status.equals("true");
                 authStatus = true;
             }
         } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -132,7 +132,7 @@ public class SlackConnection {
             LOGGER.config("Building GET request");
             LinkedHashMap<String,String> params = new LinkedHashMap<String, String>();
             params.put("token", token);
-            params.put("channel", channel);
+            params.put("channel", channel.startsWith("#") ? channel : "#" + channel);
             params.put("text", message);
             for (Map.Entry entry : params.entrySet()) {
                 baseMessageUrl.append(entry.getKey());
@@ -152,7 +152,7 @@ public class SlackConnection {
         return response;
     }
 
-    public void getRoomList(int type) throws InputMismatchException, IOException {
+    public String getRoomList(int type) throws InputMismatchException, IOException {
         String url;
         switch (type) {
             case CHANNEL:
@@ -171,6 +171,7 @@ public class SlackConnection {
         HttpsURLConnection con = sendGetRequest(new URL(url));
         String response = extractResponse(con);
         LOGGER.info(response);
+        return response;
 
     }
 
@@ -180,8 +181,18 @@ public class SlackConnection {
 
     public static void main(String[] args) throws IOException, InputMismatchException {
         SlackConnection slack = new SlackConnection();
-        slack.postToSlack("C061NB8LD", "Test");
-//        slack.getRoomList(SlackConnection.GROUP);
+//        slack.postToSlack("C061NB8LD", "Test");
+        String result = slack.getRoomList(GROUP);
+        JsonElement parsed = new JsonParser().parse(result);
+        JsonObject jObject = parsed.getAsJsonObject();
+        String status = jObject.get("ok").toString();
+        JsonArray jarray = jObject.getAsJsonArray("groups");
+        List<String> options = new LinkedList<String>();
+        Iterator<JsonElement> jelement = jarray.iterator();
+        while (jelement.hasNext()) {
+            options.add(jelement.next().getAsJsonObject().get("name").toString());
+        }
+        LOGGER.info("Test");
     }
 
 }

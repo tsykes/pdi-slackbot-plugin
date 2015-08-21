@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import com.google.gson.internal.LinkedTreeMap;
 import org.pentaho.di.cluster.SlaveServer;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.Result;
@@ -71,8 +72,8 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
 
     // This field holds the configured result of the job entry.
     // It is configured in the SlackBotDialog
-    private String selectedChannel, customText;
-    private boolean successMsg, failureMsg, customMsg;
+    private String selectedChannel, customText, postType, token;
+    private boolean successMsg, failureMsg, customMsg, alert;
     private LinkedList<String> channelList;
 
     /**
@@ -86,9 +87,12 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
 
         // the default is to generate a positive outcome
         selectedChannel = "";
+        token = "";
+        postType = "Channel";
         successMsg = true;
         failureMsg = false;
         customMsg = false;
+        alert = false;
         customText = "";
         channelList = new LinkedList<String>();
     }
@@ -141,7 +145,9 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
         StringBuffer retval = new StringBuffer(1000);
 
         retval.append(super.getXML());
+        retval.append("      ").append(XMLHandler.addTagValue("token", selectedChannel));
         retval.append("      ").append(XMLHandler.addTagValue("selectedChannel", selectedChannel));
+        retval.append("      ").append(XMLHandler.addTagValue("alert", alert));
         retval.append("      ").append(XMLHandler.addTagValue("customMsg", customMsg));
         retval.append("      ").append(XMLHandler.addTagValue("successMsg", successMsg));
         retval.append("      ").append(XMLHandler.addTagValue("failureMsg", failureMsg));
@@ -173,8 +179,9 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
 
         try{
             super.loadXML(entrynode, databases, slaveServers);
-
+            selectedChannel = XMLHandler.getTagValue(entrynode, "token");
             selectedChannel = XMLHandler.getTagValue(entrynode, "selectedChannel");
+            alert = "Y".equalsIgnoreCase(XMLHandler.getTagValue(entrynode, "alert"));
             successMsg = "Y".equalsIgnoreCase(XMLHandler.getTagValue(entrynode, "successMsg"));
             failureMsg = "Y".equalsIgnoreCase(XMLHandler.getTagValue(entrynode, "failureMsg"));
             customMsg = "Y".equalsIgnoreCase(XMLHandler.getTagValue(entrynode, "customMsg"));
@@ -325,6 +332,28 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
         this.customMsg = customMsg;
     }
 
+    public boolean isAlert() {
+        return alert;
+    }
 
+    public void setAlert(boolean alert) {
+        this.alert = alert;
+    }
+
+    public String getPostType() {
+        return postType;
+    }
+
+    public void setPostType(String postType) {
+        this.postType = postType;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }
 
