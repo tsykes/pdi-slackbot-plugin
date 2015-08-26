@@ -27,6 +27,7 @@ import java.net.ConnectException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import com.google.gson.internal.LinkedTreeMap;
 import org.pentaho.di.cluster.SlaveServer;
@@ -45,6 +46,7 @@ import org.pentaho.di.repository.ObjectId;
 import org.pentaho.di.repository.Repository;
 import org.pentaho.metastore.api.IMetaStore;
 import org.w3c.dom.Node;
+import static com.findthebest.slack.BotIcons.botIcons;
 
 /**
  * This defines a 'create folder' job entry. Its main use would be to create empty folder that can be used to control
@@ -73,10 +75,10 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
 
     // This field holds the configured result of the job entry.
     // It is configured in the SlackBotDialog
-    private String selectedChannel, customText, postType, token, botName;
+    private String selectedChannel, customText, postType, token, botName, botIcon;
     private boolean successMsg, failureMsg, customMsg, alert;
     private LinkedList<String> channelList;
-    private final String defaultName = "Bot";
+    private final String defaultName = "Bot", defaultIcon = ":pig:";
 
     /**
      * The JobEntry constructor executes super() and initializes its fields
@@ -92,11 +94,12 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
         token = "";
         postType = "Channel";
         botName = defaultName;
+        botIcon = defaultIcon;
         successMsg = true;
         failureMsg = false;
         customMsg = false;
         alert = false;
-        customText = "";
+        customText = "Custom text goes here...";
         channelList = new LinkedList<String>();
     }
     /**
@@ -151,6 +154,7 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
         retval.append("      ").append(XMLHandler.addTagValue("token", token));
         retval.append("      ").append(XMLHandler.addTagValue("selectedChannel", selectedChannel));
         retval.append("      ").append(XMLHandler.addTagValue("botName", botName));
+        retval.append("      ").append(XMLHandler.addTagValue("botIcon", botIcon));
         retval.append("      ").append(XMLHandler.addTagValue("alert", alert));
         retval.append("      ").append(XMLHandler.addTagValue("customMsg", customMsg));
         retval.append("      ").append(XMLHandler.addTagValue("successMsg", successMsg));
@@ -186,6 +190,7 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
             setToken(XMLHandler.getTagValue(entrynode, "token"));
             setSelectedChannel(XMLHandler.getTagValue(entrynode, "selectedChannel"));
             botName = XMLHandler.getTagValue(entrynode, "botName");
+            botIcon = XMLHandler.getTagValue(entrynode, "botIcon");
             alert = "Y".equalsIgnoreCase(XMLHandler.getTagValue(entrynode, "alert"));
             successMsg = "Y".equalsIgnoreCase(XMLHandler.getTagValue(entrynode, "successMsg"));
             failureMsg = "Y".equalsIgnoreCase(XMLHandler.getTagValue(entrynode, "failureMsg"));
@@ -276,7 +281,7 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
             }
             logBasic("Sending to slack");
             logBasic(slack.toString());
-            boolean result = slack.postToSlack(selectedChannel, msg, botName);
+            boolean result = slack.postToSlack(selectedChannel, msg, botName, botIcon);
             if (!result) {
                 throw new ConnectException("Unable to post to slack");
             }
@@ -377,6 +382,25 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
 
     public void setBotName(String botName) {
         this.botName = Const.NVL(botName, defaultName);
+    }
+
+    public String getBotIcon() {
+        return botIcon;
+    }
+
+    public void setBotIcon(String botIcon) {
+        if (!botIcon.startsWith(":")) {
+            botIcon = ":" + botIcon;
+        }
+        if (!botIcon.endsWith(":")) {
+            botIcon = botIcon + ":";
+        }
+        this.botIcon = botIcon;
+
+    }
+
+    public Set<String> getIconList() {
+        return botIcons;
     }
 }
 

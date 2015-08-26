@@ -65,9 +65,7 @@ import org.pentaho.di.ui.job.entry.JobEntryDialog;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
 
 import java.net.ConnectException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -327,6 +325,23 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         wBotName.setLayoutData(fdBotName);
 
 
+        // bot icon drop down
+        wlBotIcon = new Label(recipientGroup, SWT.RIGHT);
+        wlBotIcon.setText("Bot Icon:");
+        wlBotIcon.setToolTipText("Icon to use when posting to slack");
+        fdlBotIcon = new GridData();
+        fdlBotIcon.horizontalAlignment = GridData.FILL;
+        wlBotIcon.setLayoutData(fdlBotIcon);
+
+        wBotIcon = new CCombo(recipientGroup, SWT.DROP_DOWN);
+        props.setLook(wBotIcon);
+        wBotIcon.addModifyListener(lsMod);
+        fdBotIcon = new GridData();
+        fdBotIcon.horizontalAlignment = GridData.FILL;
+        fdBotIcon.grabExcessHorizontalSpace = true;
+        wBotIcon.setLayoutData(fdBotIcon);
+
+
 
         /*
          * Message section
@@ -580,6 +595,8 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
             wChannel.setText(meta.getSelectedChannel());
             wPostType.setText(meta.getPostType());
             wBotName.setText(meta.getBotName());
+            wBotIcon.setItems(meta.getIconList().toArray(new String[meta.getIconList().size()]));
+            wBotIcon.setText(meta.getBotIcon());
             standardSuccessButton.setSelection(meta.isSuccessMsg());
             standardFailureButton.setSelection(meta.isFailureMsg());
             customMessageButton.setSelection(meta.isCustomMsg());
@@ -629,6 +646,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         meta.setSelectedChannel(wChannel.getText());
         meta.setPostType(wPostType.getText());
         meta.setBotName(wBotName.getText());
+        meta.setBotIcon(wBotIcon.getText());
         meta.setSuccessMsg(standardSuccessButton.getSelection());
         meta.setFailureMsg(standardFailureButton.getSelection());
         meta.setCustomMsg(customMessageButton.getSelection());

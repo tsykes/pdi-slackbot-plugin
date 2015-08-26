@@ -13,6 +13,7 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import static com.findthebest.slack.BotIcons.botIcons;
 
 /**
  * Created by aoverton on 6/11/15.
@@ -126,7 +127,7 @@ public class SlackConnection {
     }
 
 
-    public boolean postToSlack(String channel, String message, String username) throws IOException {
+    public boolean postToSlack(String channel, String message, String username, String icon) throws IOException {
         if (authStatus) {
             LOGGER.config("Building GET request");
             LinkedHashMap<String,String> params = new LinkedHashMap<String, String>();
@@ -134,6 +135,7 @@ public class SlackConnection {
             params.put("channel", channel.startsWith("#") ? channel : "#" + channel);
             params.put("text", message);
             params.put("username", username);
+            params.put("icon_emoji", icon);
             params.put("link_names", "1");
             for (Map.Entry entry : params.entrySet()) {
                 baseMessageUrl.append(entry.getKey());
