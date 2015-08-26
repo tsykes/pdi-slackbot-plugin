@@ -102,19 +102,20 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
     // output field name
     private Label wlChannel, standardSuccessLabel, standardFailureLabel, customMessageLabel, customTextLabel, wlUpdate,
-            wlToken, wlPostType;
+            wlToken, wlPostType, wlBotName, wlBotIcon;
     private FormData customTextLabelForm, contentGroupForm, standardSuccessButtonForm,
             standardSuccessLabelForm,textCompositeLayoutForm, standardFailureLabelForm, standardFailureButtonForm,
             customMessageButtonForm,
             customMessageLabelForm;
     private FormData customTextInputForm, recipientGroupForm;
-    private GridData fdlChannel, fdChannel, fdlUpdate, fdUpdate, fdToken, fdlToken, fdlPostType, fdPostType;
+    private GridData fdlChannel, fdChannel, fdlUpdate, fdUpdate, fdToken, fdlToken, fdlPostType, fdPostType, fdlBotName,
+            fdBotName, fdlBotIcon, fdBotIcon;
     private Button standardSuccessButton, standardFailureButton, wAlert, customMessageButton, wUpdate;
     private Group recipientGroup, contentGroup;
     private Composite wMessageComp;
-    private CCombo wChannel, wPostType;
+    private CCombo wChannel, wPostType, wBotIcon;
     private SelectionAdapter selectionAdapter;
-    private TextVar wToken;
+    private TextVar wToken, wBotName;
 
     // the job entry configuration object
     private SlackBot meta;
@@ -293,7 +294,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         wPostType.add("Channel");
         wPostType.add("Group");
 
-        // drop down
+        // room name drop down
         wlChannel = new Label(recipientGroup, SWT.RIGHT);
         wlChannel.setText("Channel/Group:");
         wlChannel.setToolTipText("The name of the Slack Channel/Group/DM. Populated based on Post Type.");
@@ -308,6 +309,22 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         fdChannel.horizontalAlignment = GridData.FILL;
         fdChannel.grabExcessHorizontalSpace = true;
         wChannel.setLayoutData(fdChannel);
+
+        // Bot Name
+        wlBotName = new Label(recipientGroup, SWT.RIGHT);
+        wlBotName.setText("Bot Name:");
+        wlBotName.setToolTipText("Optional Name to use when posting to slack");
+        fdlBotName = new GridData();
+        fdlBotName.horizontalAlignment = GridData.END;
+        wlBotName.setLayoutData(fdlBotName);
+
+        wBotName = new TextVar(jobMeta, recipientGroup, SWT.SINGLE | SWT.LEFT);
+        props.setLook(wBotName);
+        wBotName.addModifyListener(lsMod);
+        fdBotName = new GridData();
+        fdBotName.horizontalAlignment = GridData.FILL;
+        fdBotName.grabExcessHorizontalSpace = true;
+        wBotName.setLayoutData(fdBotName);
 
 
 
@@ -562,6 +579,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
             wToken.setText(meta.getToken());
             wChannel.setText(meta.getSelectedChannel());
             wPostType.setText(meta.getPostType());
+            wBotName.setText(meta.getBotName());
             standardSuccessButton.setSelection(meta.isSuccessMsg());
             standardFailureButton.setSelection(meta.isFailureMsg());
             customMessageButton.setSelection(meta.isCustomMsg());
@@ -610,6 +628,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         meta.setToken(wToken.getText());
         meta.setSelectedChannel(wChannel.getText());
         meta.setPostType(wPostType.getText());
+        meta.setBotName(wBotName.getText());
         meta.setSuccessMsg(standardSuccessButton.getSelection());
         meta.setFailureMsg(standardFailureButton.getSelection());
         meta.setCustomMsg(customMessageButton.getSelection());

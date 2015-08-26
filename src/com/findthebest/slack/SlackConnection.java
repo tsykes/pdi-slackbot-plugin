@@ -126,21 +126,22 @@ public class SlackConnection {
     }
 
 
-    public boolean postToSlack(String channel, String message) throws IOException {
+    public boolean postToSlack(String channel, String message, String username) throws IOException {
         if (authStatus) {
             LOGGER.config("Building GET request");
             LinkedHashMap<String,String> params = new LinkedHashMap<String, String>();
             params.put("token", token);
             params.put("channel", channel.startsWith("#") ? channel : "#" + channel);
             params.put("text", message);
+            params.put("username", username);
+            params.put("link_names", "1");
             for (Map.Entry entry : params.entrySet()) {
                 baseMessageUrl.append(entry.getKey());
                 baseMessageUrl.append("=");
                 baseMessageUrl.append(URLEncoder.encode((String) entry.getValue(), "UTF-8"));
                 baseMessageUrl.append("&");
             }
-//            baseMessageUrl.deleteCharAt(baseMessageUrl.length() - 1);
-            baseMessageUrl.append("link_names=1");
+            baseMessageUrl.deleteCharAt(baseMessageUrl.length() - 1);  // delete trailing &
             LOGGER.config("Sending GET request");
             LOGGER.config(baseMessageUrl.toString());
             HttpsURLConnection con = sendGetRequest(new URL(baseMessageUrl.toString()));
@@ -182,7 +183,7 @@ public class SlackConnection {
 
     public static void main(String[] args) throws IOException, InputMismatchException {
         SlackConnection slack = new SlackConnection("xoxp-2225323168-4194257109-6101248807-defb57");
-        slack.postToSlack("integration-testing", "Test");
+//        slack.postToSlack("integration-testing", "Test");
 //        String result = slack.getRoomList(GROUP);
 //        JsonElement parsed = new JsonParser().parse(result);
 //        JsonObject jObject = parsed.getAsJsonObject();

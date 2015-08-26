@@ -73,9 +73,10 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
 
     // This field holds the configured result of the job entry.
     // It is configured in the SlackBotDialog
-    private String selectedChannel, customText, postType, token;
+    private String selectedChannel, customText, postType, token, botName;
     private boolean successMsg, failureMsg, customMsg, alert;
     private LinkedList<String> channelList;
+    private final String defaultName = "Bot";
 
     /**
      * The JobEntry constructor executes super() and initializes its fields
@@ -90,6 +91,7 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
         selectedChannel = "";
         token = "";
         postType = "Channel";
+        botName = defaultName;
         successMsg = true;
         failureMsg = false;
         customMsg = false;
@@ -143,11 +145,12 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
      */
     @Override
     public String getXML(){
-        StringBuffer retval = new StringBuffer(1000);
+        StringBuffer retval = new StringBuffer();
 
         retval.append(super.getXML());
         retval.append("      ").append(XMLHandler.addTagValue("token", token));
         retval.append("      ").append(XMLHandler.addTagValue("selectedChannel", selectedChannel));
+        retval.append("      ").append(XMLHandler.addTagValue("botName", botName));
         retval.append("      ").append(XMLHandler.addTagValue("alert", alert));
         retval.append("      ").append(XMLHandler.addTagValue("customMsg", customMsg));
         retval.append("      ").append(XMLHandler.addTagValue("successMsg", successMsg));
@@ -180,13 +183,14 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
 
         try{
             super.loadXML(entrynode, databases, slaveServers);
-            token = XMLHandler.getTagValue(entrynode, "token");
-            selectedChannel = XMLHandler.getTagValue(entrynode, "selectedChannel");
+            setToken(XMLHandler.getTagValue(entrynode, "token"));
+            setSelectedChannel(XMLHandler.getTagValue(entrynode, "selectedChannel"));
+            botName = XMLHandler.getTagValue(entrynode, "botName");
             alert = "Y".equalsIgnoreCase(XMLHandler.getTagValue(entrynode, "alert"));
             successMsg = "Y".equalsIgnoreCase(XMLHandler.getTagValue(entrynode, "successMsg"));
             failureMsg = "Y".equalsIgnoreCase(XMLHandler.getTagValue(entrynode, "failureMsg"));
             customMsg = "Y".equalsIgnoreCase(XMLHandler.getTagValue(entrynode, "customMsg"));
-            customText = XMLHandler.getTagValue(entrynode, "customText");
+            setCustomText(XMLHandler.getTagValue(entrynode, "customText"));
             // populate channel list
             Node channels = XMLHandler.getSubNode( entrynode, "channels" );
             int count = XMLHandler.countNodes( channels, "channel" );
@@ -272,7 +276,7 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
             }
             logBasic("Sending to slack");
             logBasic(slack.toString());
-            boolean result = slack.postToSlack(selectedChannel, msg);
+            boolean result = slack.postToSlack(selectedChannel, msg, botName);
             if (!result) {
                 throw new ConnectException("Unable to post to slack");
             }
@@ -308,7 +312,7 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
     }
 
     public void setSelectedChannel(String selectedChannel) {
-        this.selectedChannel = selectedChannel;
+        this.selectedChannel = Const.NVL(selectedChannel, "");
     }
 
     public String getCustomText() {
@@ -316,7 +320,7 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
     }
 
     public void setCustomText(String customText) {
-        this.customText = customText;
+        this.customText = Const.NVL(customText, "");
     }
 
     public boolean isSuccessMsg() {
@@ -364,7 +368,15 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
     }
 
     public void setToken(String token) {
-        this.token = token;
+        this.token = Const.NVL(token, "");
+    }
+
+    public String getBotName() {
+        return botName;
+    }
+
+    public void setBotName(String botName) {
+        this.botName = Const.NVL(botName, defaultName);
     }
 }
 
