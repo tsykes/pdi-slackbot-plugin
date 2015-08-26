@@ -36,13 +36,10 @@ public class SlackConnection {
     private int OK = 200;
     private String baseAuthUrl = "https://slack.com/api/auth.test?token=";
     private StringBuilder baseMessageUrl = new StringBuilder("https://slack.com/api/chat.postMessage?");
-    private String configFile = "config.properties";
     private Boolean authStatus;
     private String token;
     private final static Logger LOGGER = Logger.getLogger(SlackConnection.class.getName());
     public final static int CHANNEL = 1, GROUP = 2, DM = 3;
-    private final String propertiesFile = "com/findthebest/slack/resources/config.properties";
-    Properties properties;
 
 
 
@@ -62,8 +59,7 @@ public class SlackConnection {
     public SlackConnection(String passedToken, Boolean debug) {
         try {
             gson = new Gson();
-//            properties = loadProperties(propertiesFile);
-            token = passedToken; //== null ? properties.getProperty("defaultToken") : passedToken;
+            token = passedToken;
             configLogger(Level.CONFIG);
             String authUrlString = baseAuthUrl + token;
             LOGGER.config("Attempting to Auth");
@@ -100,22 +96,6 @@ public class SlackConnection {
         handler.setFormatter(new SimpleFormatter());
         handler.setLevel(logLevel);
         LOGGER.addHandler(handler);
-    }
-
-    private static Properties loadProperties(String propFile) throws FileNotFoundException {
-        InputStream in = SlackConnection.class.getClassLoader().getResourceAsStream(propFile);
-        Properties properties = new Properties();
-        try {
-            if (in != null) {
-                properties.load(in);
-            } else {
-                throw new FileNotFoundException(String.format("property file %s not found in classpath", propFile));
-            }
-
-        } catch (IOException e) {
-            throw new FileNotFoundException();
-        }
-        return properties;
     }
 
     private HttpsURLConnection sendGetRequest(URL url) throws IOException {
@@ -191,22 +171,6 @@ public class SlackConnection {
 
     public Boolean getAuthStatus() {
         return authStatus;
-    }
-
-    public static void main(String[] args) throws IOException, InputMismatchException {
-        SlackConnection slack = new SlackConnection("xoxp-2225323168-4194257109-6101248807-defb57");
-//        slack.postToSlack("integration-testing", "Test");
-//        String result = slack.getRoomList(GROUP);
-//        JsonElement parsed = new JsonParser().parse(result);
-//        JsonObject jObject = parsed.getAsJsonObject();
-//        String status = jObject.get("ok").toString();
-//        JsonArray jarray = jObject.getAsJsonArray("groups");
-//        List<String> options = new LinkedList<String>();
-//        Iterator<JsonElement> jelement = jarray.iterator();
-//        while (jelement.hasNext()) {
-//            options.add(jelement.next().getAsJsonObject().get("name").toString());
-//        }
-//        LOGGER.info("Test");
     }
 
     private static boolean determineStatus(String apiResult) {
