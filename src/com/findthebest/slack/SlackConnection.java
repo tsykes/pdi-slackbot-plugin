@@ -1,19 +1,28 @@
 package com.findthebest.slack;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.internal.LinkedTreeMap;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.InputMismatchException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-import static com.findthebest.slack.BotIcons.botIcons;
 
 /**
  * Created by aoverton on 6/11/15.
@@ -137,6 +146,7 @@ public class SlackConnection {
             params.put("username", username);
             params.put("icon_emoji", icon);
             params.put("link_names", "1");
+            params.put("unfurl_links", "true");
             for (Map.Entry entry : params.entrySet()) {
                 baseMessageUrl.append(entry.getKey());
                 baseMessageUrl.append("=");
