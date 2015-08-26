@@ -1,4 +1,4 @@
-package com.findthebest.slack;
+package com.graphiq.kettle.jobentries.slack;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;

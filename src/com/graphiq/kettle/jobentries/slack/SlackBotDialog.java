@@ -20,7 +20,7 @@
  *
  ******************************************************************************/
 
-package com.findthebest.slack;
+package com.graphiq.kettle.jobentries.slack;
 
 
 

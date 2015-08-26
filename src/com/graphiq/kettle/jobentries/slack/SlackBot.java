@@ -20,7 +20,7 @@
  *
  ******************************************************************************/
 
-package com.findthebest.slack;
+package com.graphiq.kettle.jobentries.slack;
 
 
 import java.net.ConnectException;
@@ -45,7 +45,7 @@ import org.pentaho.di.repository.ObjectId;
 import org.pentaho.di.repository.Repository;
 import org.pentaho.metastore.api.IMetaStore;
 import org.w3c.dom.Node;
-import static com.findthebest.slack.BotIcons.botIcons;
+import static com.graphiq.kettle.jobentries.slack.BotIcons.botIcons;
 
 /**
  * This defines a 'create folder' job entry. Its main use would be to create empty folder that can be used to control
