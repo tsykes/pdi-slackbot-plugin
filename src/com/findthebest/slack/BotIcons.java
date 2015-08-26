@@ -1,6 +1,9 @@
 package com.findthebest.slack;
 
-import java.util.*;
+
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * A set of icons that can be used with the Slackbot step as the logo

@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import com.google.gson.internal.LinkedTreeMap;
 import org.pentaho.di.cluster.SlaveServer;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.Result;
