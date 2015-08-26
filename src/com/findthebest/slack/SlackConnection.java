@@ -52,8 +52,8 @@ public class SlackConnection {
     public SlackConnection(String passedToken, Boolean debug) {
         try {
             gson = new Gson();
-            properties = loadProperties(propertiesFile);
-            token = passedToken == null ? properties.getProperty("defaultToken") : passedToken;
+//            properties = loadProperties(propertiesFile);
+            token = passedToken; //== null ? properties.getProperty("defaultToken") : passedToken;
             configLogger(Level.CONFIG);
             String authUrlString = baseAuthUrl + token;
             LOGGER.config("Attempting to Auth");
@@ -126,8 +126,7 @@ public class SlackConnection {
     }
 
 
-    public String postToSlack(String channel, String message) throws IOException {
-        String response = "none";
+    public boolean postToSlack(String channel, String message) throws IOException {
         if (authStatus) {
             LOGGER.config("Building GET request");
             LinkedHashMap<String,String> params = new LinkedHashMap<String, String>();
@@ -143,13 +142,15 @@ public class SlackConnection {
 //            baseMessageUrl.deleteCharAt(baseMessageUrl.length() - 1);
             baseMessageUrl.append("link_names=1");
             LOGGER.config("Sending GET request");
+            LOGGER.config(baseMessageUrl.toString());
             HttpsURLConnection con = sendGetRequest(new URL(baseMessageUrl.toString()));
-            response = extractResponse(con);
+            String response = extractResponse(con);
             LOGGER.config(response);
+            return determineStatus(response);
         } else {
             LOGGER.severe("Client not authed");
         }
-        return response;
+        return false;
     }
 
     public String getRoomList(int type) throws InputMismatchException, IOException {
@@ -180,19 +181,31 @@ public class SlackConnection {
     }
 
     public static void main(String[] args) throws IOException, InputMismatchException {
-        SlackConnection slack = new SlackConnection();
-//        slack.postToSlack("C061NB8LD", "Test");
-        String result = slack.getRoomList(GROUP);
-        JsonElement parsed = new JsonParser().parse(result);
+        SlackConnection slack = new SlackConnection("xoxp-2225323168-4194257109-6101248807-defb57");
+        slack.postToSlack("integration-testing", "Test");
+//        String result = slack.getRoomList(GROUP);
+//        JsonElement parsed = new JsonParser().parse(result);
+//        JsonObject jObject = parsed.getAsJsonObject();
+//        String status = jObject.get("ok").toString();
+//        JsonArray jarray = jObject.getAsJsonArray("groups");
+//        List<String> options = new LinkedList<String>();
+//        Iterator<JsonElement> jelement = jarray.iterator();
+//        while (jelement.hasNext()) {
+//            options.add(jelement.next().getAsJsonObject().get("name").toString());
+//        }
+//        LOGGER.info("Test");
+    }
+
+    private static boolean determineStatus(String apiResult) {
+        JsonElement parsed = new JsonParser().parse(apiResult);
         JsonObject jObject = parsed.getAsJsonObject();
         String status = jObject.get("ok").toString();
-        JsonArray jarray = jObject.getAsJsonArray("groups");
-        List<String> options = new LinkedList<String>();
-        Iterator<JsonElement> jelement = jarray.iterator();
-        while (jelement.hasNext()) {
-            options.add(jelement.next().getAsJsonObject().get("name").toString());
-        }
-        LOGGER.info("Test");
+        return status.equals("true");
+    }
+
+
+    public String toString() {
+        return String.format("token: %s, auth_status: %b", token, authStatus);
     }
 
 }

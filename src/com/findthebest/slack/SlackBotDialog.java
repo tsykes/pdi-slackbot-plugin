@@ -53,6 +53,7 @@ import org.eclipse.swt.custom.CCombo;
 
 import org.pentaho.di.core.Const;
 import org.pentaho.di.i18n.BaseMessages;
+import org.pentaho.di.ui.core.widget.ControlSpaceKeyAdapter;
 import org.pentaho.di.ui.core.widget.TextVar;
 import org.pentaho.di.job.JobMeta;
 import org.pentaho.di.job.entry.JobEntryDialogInterface;
@@ -98,26 +99,22 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
     // the text box for the job entry name
     private Text wName, customTextInput;
-    // the combo box for the outcomes
-    private CCombo wOutcome;
 
     // output field name
-    private TextVar emailInput, passwordInput, appIDInput,
-            listDelimiterInput;
-
-    private Label wlChannel, standardSuccessLabel, standardFailureLabel, customMessageLabel, customTextLabel, wlAlert, wlUpdate, wlToken, wlPostType;
+    private Label wlChannel, standardSuccessLabel, standardFailureLabel, customMessageLabel, customTextLabel, wlUpdate,
+            wlToken, wlPostType;
     private FormData customTextLabelForm, contentGroupForm, standardSuccessButtonForm,
-            standardSuccessLabelForm,textCompositeLayoutForm, standardFailureLabelForm, standardFailureButtonForm, customMessageButtonForm,
+            standardSuccessLabelForm,textCompositeLayoutForm, standardFailureLabelForm, standardFailureButtonForm,
+            customMessageButtonForm,
             customMessageLabelForm;
     private FormData customTextInputForm, recipientGroupForm;
-    private GridData fdlChannel, fdChannel, alertGrid, gdAlert, fdlUpdate, fdUpdate, fdToken, fdlToken, fdlPostType, fdPostType;
-    private Combo directInput, privateInput;
+    private GridData fdlChannel, fdChannel, fdlUpdate, fdUpdate, fdToken, fdlToken, fdlPostType, fdPostType;
     private Button standardSuccessButton, standardFailureButton, wAlert, customMessageButton, wUpdate;
     private Group recipientGroup, contentGroup;
     private Composite wMessageComp;
     private CCombo wChannel, wPostType;
     private SelectionAdapter selectionAdapter;
-    private Text wToken;
+    private TextVar wToken;
 
     // the job entry configuration object
     private SlackBot meta;
@@ -252,7 +249,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         fdlToken.horizontalAlignment = GridData.END;
         wlToken.setLayoutData(fdlToken);
 
-        wToken = new Text(recipientGroup, SWT.SINGLE | SWT.LEFT);
+        wToken = new TextVar(jobMeta, recipientGroup, SWT.SINGLE | SWT.LEFT);
         props.setLook(wToken);
         wToken.addModifyListener(lsMod);
         fdToken = new GridData();
@@ -298,7 +295,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
         // drop down
         wlChannel = new Label(recipientGroup, SWT.RIGHT);
-        wlChannel.setText("Channel/Group/DM:");
+        wlChannel.setText("Channel/Group:");
         wlChannel.setToolTipText("The name of the Slack Channel/Group/DM. Populated based on Post Type.");
         fdlChannel = new GridData();
         fdlChannel.horizontalAlignment = GridData.FILL;
@@ -312,22 +309,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         fdChannel.grabExcessHorizontalSpace = true;
         wChannel.setLayoutData(fdChannel);
 
-        // send as alert
-        wlAlert = new Label(recipientGroup, SWT.RIGHT);
-        wlAlert.setText("Send as Alert:");
-        wlAlert.setToolTipText("Send message as alert style message instead of basic message");
-        alertGrid = new GridData();
-        alertGrid.horizontalAlignment = GridData.FILL;
-        alertGrid.grabExcessHorizontalSpace = true;
-        wlAlert.setLayoutData(alertGrid);
 
-        wAlert = new Button( recipientGroup, SWT.CHECK );
-        props.setLook(wAlert);
-        gdAlert = new GridData();
-        alertGrid.horizontalAlignment = GridData.FILL;
-        alertGrid.grabExcessHorizontalSpace = true;
-        wAlert.setLayoutData(gdAlert);
-        wAlert.addSelectionListener(selectionAdapter);
 
         /*
          * Message section
@@ -410,10 +392,6 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
             }
         };
 
-
-
-
-
         customMessageButton.addListener(SWT.Selection, lsCustom);
         customMessageButton.addSelectionListener(selectionAdapter);
         standardFailureButton.addListener(SWT.Selection, lsStock);
@@ -424,7 +402,8 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         wUpdate.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
                 try {
-                    SlackConnection slack = new SlackConnection(wToken.getText());
+                    List<String> vars = jobMeta.getUsedVariables();
+                    SlackConnection slack = new SlackConnection(meta.environmentSubstitute(wToken.getText()));
                     if (!slack.getAuthStatus()) {
                         throw new ConnectException("Couldn't connect to Slack");
                     }
@@ -492,7 +471,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         customTextLabelForm.top = new FormAttachment(separator2, margin);
         customTextLabel.setLayoutData(customTextLabelForm);
 
-        customTextInput = new Text(contentGroup , SWT.MULTI | SWT.LEFT | SWT.WRAP);
+        customTextInput = new Text(contentGroup , SWT.MULTI | SWT.LEFT | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
         props.setLook(customTextInput);
         customTextInput.addModifyListener(lsMod);
         customTextInputForm = new FormData();
@@ -501,16 +480,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         customTextInputForm.top = new FormAttachment(customTextLabel, margin);
         customTextInputForm.bottom = new FormAttachment(customTextLabel, 150);
         customTextInput.setLayoutData(customTextInputForm);
-
-        /*
-         * Add listener to radio button
-         */
-
-        /*//Place all the above into tab item "Text"
-        TabItem text = new TabItem(tabFolder, SWT.NONE);
-        text.setText("Text");
-        text.setToolTipText("This tab controls the text in the message");
-        text.setControl(textComposite);*/
+        customTextInput.addKeyListener(new ControlSpaceKeyAdapter(jobMeta, customTextInput));
 
         /*
          * Ok and Cancel buttons
@@ -592,7 +562,6 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
             wToken.setText(meta.getToken());
             wChannel.setText(meta.getSelectedChannel());
             wPostType.setText(meta.getPostType());
-            wAlert.setSelection(meta.isAlert());
             standardSuccessButton.setSelection(meta.isSuccessMsg());
             standardFailureButton.setSelection(meta.isFailureMsg());
             customMessageButton.setSelection(meta.isCustomMsg());
@@ -604,9 +573,6 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
             customTextInput.setText(meta.getCustomText());
         }
         wName.selectAll();
-
-        // choosing the configured value for the outcome on the selector box
-        //wOutcome.select(meta.getOutcome()?0:1);
 
     }
 
@@ -644,7 +610,6 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         meta.setToken(wToken.getText());
         meta.setSelectedChannel(wChannel.getText());
         meta.setPostType(wPostType.getText());
-        meta.setAlert(wAlert.getSelection());
         meta.setSuccessMsg(standardSuccessButton.getSelection());
         meta.setFailureMsg(standardFailureButton.getSelection());
         meta.setCustomMsg(customMessageButton.getSelection());

@@ -23,6 +23,7 @@
 package com.findthebest.slack;
 
 
+import java.net.ConnectException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -145,7 +146,7 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
         StringBuffer retval = new StringBuffer(1000);
 
         retval.append(super.getXML());
-        retval.append("      ").append(XMLHandler.addTagValue("token", selectedChannel));
+        retval.append("      ").append(XMLHandler.addTagValue("token", token));
         retval.append("      ").append(XMLHandler.addTagValue("selectedChannel", selectedChannel));
         retval.append("      ").append(XMLHandler.addTagValue("alert", alert));
         retval.append("      ").append(XMLHandler.addTagValue("customMsg", customMsg));
@@ -179,7 +180,7 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
 
         try{
             super.loadXML(entrynode, databases, slaveServers);
-            selectedChannel = XMLHandler.getTagValue(entrynode, "token");
+            token = XMLHandler.getTagValue(entrynode, "token");
             selectedChannel = XMLHandler.getTagValue(entrynode, "selectedChannel");
             alert = "Y".equalsIgnoreCase(XMLHandler.getTagValue(entrynode, "alert"));
             successMsg = "Y".equalsIgnoreCase(XMLHandler.getTagValue(entrynode, "successMsg"));
@@ -253,25 +254,35 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
         int errors = 0;
         boolean outcome = true;
         try {
-            SlackConnection slack = new SlackConnection();
+            String resolvedToken = environmentSubstitute(token);
+            if (isDebug()) {
+                logDebug("Token is: " + resolvedToken);
+            }
+            SlackConnection slack = new SlackConnection(resolvedToken);
+            if (!slack.getAuthStatus()) {
+                throw new ConnectException("Unable to authenticate");
+            }
             String msg;
             if (successMsg) {
                 msg = ":white_check_mark: Job executed successfully";
             } else if (failureMsg) {
                 msg = ":x: Job failed";
             } else {
-                msg = customText;
+                msg = environmentSubstitute(customText);
             }
             logBasic("Sending to slack");
-            logBasic(slack.postToSlack(selectedChannel, msg));
+            logBasic(slack.toString());
+            boolean result = slack.postToSlack(selectedChannel, msg);
+            if (!result) {
+                throw new ConnectException("Unable to post to slack");
+            }
+            // indicate there are no errors
+            prev_result.setNrErrors(errors);
         } catch (Exception e) {
             logBasic(e.getMessage());
             errors++;
             outcome = false;
         }
-
-        // indicate there are no errors
-        prev_result.setNrErrors(errors);
         // indicate the result as configured
         prev_result.setResult(outcome);
         return prev_result;
