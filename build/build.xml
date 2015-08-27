@@ -50,7 +50,6 @@
 		<jar jarfile="${diststep}/${jarfilename}" basedir="${classes}"/>
 
         <!-- zip folder for distribution-->
-        <!--<zip destfile="${diststepdir}/${pluginname}.zip" basedir="${diststep}" includes="${diststep}/**/*.jar"/>-->
         <zip destfile="${diststepdir}/${pluginname}.zip">
             <zipfileset dir="${diststep}" prefix="${pluginname}/"/>
         </zip>
