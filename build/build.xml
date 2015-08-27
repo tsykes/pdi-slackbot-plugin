@@ -12,8 +12,8 @@
     <property name="classes" location="classes" />
     <property name="dist" location="dist" />
     <property name="diststepdir" location="${dist}/jobentries" />
-    <property name="diststep" location="${diststepdir}/SlackBot" />
     <property name="pluginname" value="SlackBot" />
+    <property name="diststep" location="${diststepdir}/${pluginname}" />
     <property name="jarfilename" value="slackbot-jobentry.jar" />
 
 
@@ -50,7 +50,10 @@
 		<jar jarfile="${diststep}/${jarfilename}" basedir="${classes}"/>
 
         <!-- zip folder for distribution-->
-        <zip destfile="${diststepdir}/${pluginname}.zip" basedir="${diststep}" />
+        <!--<zip destfile="${diststepdir}/${pluginname}.zip" basedir="${diststep}" includes="${diststep}/**/*.jar"/>-->
+        <zip destfile="${diststepdir}/${pluginname}.zip">
+            <zipfileset dir="${diststep}" prefix="${pluginname}/"/>
+        </zip>
 
 	</target>
 	
