@@ -268,13 +268,13 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
             }
             SlackConnection slack = new SlackConnection(resolvedToken);
             if (!slack.getAuthStatus()) {
-                throw new ConnectException("Unable to authenticate");
+                throw new ConnectException(BaseMessages.getString(PKG, "SlackBot.AuthError"));
             }
             String msg;
             if (successMsg) {
-                msg = ":white_check_mark: Job executed successfully";
+                msg = BaseMessages.getString(PKG, "SlackBot.StandardSuccess");
             } else if (failureMsg) {
-                msg = ":x: Job failed";
+                msg = BaseMessages.getString(PKG, "SlackBot.StandardFailure");
             } else {
                 msg = environmentSubstitute(customText);
             }
@@ -282,7 +282,7 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
             logBasic(slack.toString());
             boolean result = slack.postToSlack(selectedChannel, msg, botName, botIcon);
             if (!result) {
-                throw new ConnectException("Unable to post to slack");
+                throw new ConnectException(BaseMessages.getString(PKG, "SlackBot.PostError"));
             }
             // indicate there are no errors
             prev_result.setNrErrors(errors);

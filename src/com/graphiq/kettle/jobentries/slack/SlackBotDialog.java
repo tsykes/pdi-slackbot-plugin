@@ -186,7 +186,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         formLayout.marginHeight = Const.FORM_MARGIN;
 
         shell.setLayout(formLayout);
-        shell.setText("Slack Messages " + SlackBotDialog.STEP_VERSION);
+        shell.setText(BaseMessages.getString(PKG, "SlackBot.Shell.Title") + SlackBotDialog.STEP_VERSION);
 
         int middle = props.getMiddlePct();
         int margin = Const.MARGIN;
@@ -195,7 +195,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
         // Job entry name line
         Label wlName = new Label(shell, SWT.RIGHT);
-        wlName.setText("Step Name: ");
+        wlName.setText(BaseMessages.getString(PKG, "SlackBot.StepNameLabel"));
         props.setLook(wlName);
         FormData fdlName = new FormData();
         fdlName.left = new FormAttachment(0, 0);
@@ -233,7 +233,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
          */
 
         recipientGroup = new Group(shell,SWT.SHADOW_NONE);
-        recipientGroup.setText("Message Settings");
+        recipientGroup.setText(BaseMessages.getString(PKG, "SlackBot.MessageSettings"));
         props.setLook(recipientGroup);
         recipientGroupForm = new FormData();
         recipientGroupForm.left = new FormAttachment(0, 0);
@@ -246,8 +246,8 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
         // token
         wlToken = new Label(recipientGroup, SWT.RIGHT);
-        wlToken.setText("Token:");
-        wlToken.setToolTipText("Go to https://api.slack.com/web to see your token or create a new one");
+        wlToken.setText(BaseMessages.getString(PKG, "SlackBot.Token"));
+        wlToken.setToolTipText(BaseMessages.getString(PKG, "SlackBot.TokenTip"));
         fdlToken = new GridData();
         fdlToken.horizontalAlignment = GridData.END;
         wlToken.setLayoutData(fdlToken);
@@ -265,8 +265,8 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
          */
 
         wlUpdate = new Label(recipientGroup, SWT.RIGHT);
-        wlUpdate.setText("Update Channels:");
-        wlUpdate.setToolTipText("Update the list of channels available");
+        wlUpdate.setText(BaseMessages.getString(PKG, "SlackBot.UpdateChannel"));
+        wlUpdate.setToolTipText(BaseMessages.getString(PKG, "SlackBot.UpdateChannelTip"));
         fdlUpdate = new GridData();
         fdlUpdate.horizontalAlignment = GridData.END;
         wlUpdate.setLayoutData(fdlUpdate);
@@ -280,8 +280,8 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
         // post type
         wlPostType = new Label(recipientGroup, SWT.RIGHT);
-        wlPostType.setText("Post Type:");
-        wlPostType.setToolTipText("Influences what gets populated in Channel/Group/DM");
+        wlPostType.setText(BaseMessages.getString(PKG, "SlackBot.PostType"));
+        wlPostType.setToolTipText(BaseMessages.getString(PKG, "SlackBot.PostTypeTip"));
         fdlPostType = new GridData();
         fdlPostType.horizontalAlignment = GridData.FILL;
         wlPostType.setLayoutData(fdlPostType);
@@ -298,8 +298,8 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
         // room name drop down
         wlChannel = new Label(recipientGroup, SWT.RIGHT);
-        wlChannel.setText("Channel/Group:");
-        wlChannel.setToolTipText("The name of the Slack Channel/Group/DM. Populated based on Post Type.");
+        wlChannel.setText(BaseMessages.getString(PKG, "SlackBot.RoomName"));
+        wlChannel.setToolTipText(BaseMessages.getString(PKG, "SlackBot.RoomNameTip"));
         fdlChannel = new GridData();
         fdlChannel.horizontalAlignment = GridData.FILL;
         wlChannel.setLayoutData(fdlChannel);
@@ -314,8 +314,8 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
         // Bot Name
         wlBotName = new Label(recipientGroup, SWT.RIGHT);
-        wlBotName.setText("Bot Name:");
-        wlBotName.setToolTipText("Optional Name to use when posting to slack");
+        wlBotName.setText(BaseMessages.getString(PKG, "SlackBot.BotName"));
+        wlBotName.setToolTipText(BaseMessages.getString(PKG, "SlackBot.BotNameTip"));
         fdlBotName = new GridData();
         fdlBotName.horizontalAlignment = GridData.END;
         wlBotName.setLayoutData(fdlBotName);
@@ -331,8 +331,8 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
         // bot icon drop down
         wlBotIcon = new Label(recipientGroup, SWT.RIGHT);
-        wlBotIcon.setText("Bot Icon:");
-        wlBotIcon.setToolTipText("Icon to use when posting to slack");
+        wlBotIcon.setText(BaseMessages.getString(PKG, "SlackBot.BotIcon"));
+        wlBotIcon.setToolTipText(BaseMessages.getString(PKG, "SlackBot.BotIconTip"));
         fdlBotIcon = new GridData();
         fdlBotIcon.horizontalAlignment = GridData.FILL;
         wlBotIcon.setLayoutData(fdlBotIcon);
@@ -352,7 +352,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
          */
 
         contentGroup = new Group(shell,SWT.SHADOW_NONE);
-        contentGroup.setText("Message");
+        contentGroup.setText(BaseMessages.getString(PKG, "SlackBot.Message"));
         props.setLook(contentGroup);
         contentGroupForm = new FormData();
         contentGroupForm.left = new FormAttachment(0, 0);
@@ -381,8 +381,8 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         standardSuccessButton.setLayoutData(standardSuccessButtonForm);
 
         standardSuccessLabel = new Label(contentGroup, SWT.LEFT);
-        standardSuccessLabel.setToolTipText("Send a templated success messages indicating the job has run successfully");
-        standardSuccessLabel.setText("Send Standard Success Message");
+        standardSuccessLabel.setText(BaseMessages.getString(PKG, "SlackBot.Success"));
+        standardSuccessLabel.setToolTipText(BaseMessages.getString(PKG, "SlackBot.StandardSuccess"));
         standardSuccessLabelForm = new FormData();
         standardSuccessLabelForm.left = new FormAttachment(10, 0);
         standardSuccessLabelForm.right = new FormAttachment(100, 0);
@@ -399,8 +399,8 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         standardFailureButton.setLayoutData(standardFailureButtonForm);
 
         standardFailureLabel = new Label(contentGroup, SWT.LEFT);
-        standardFailureLabel.setToolTipText("Send a templated failure messages indicating the job has not run successfully");
-        standardFailureLabel.setText("Send Standard Failure Message");
+        standardFailureLabel.setText(BaseMessages.getString(PKG, "SlackBot.Failure"));
+        standardFailureLabel.setToolTipText(BaseMessages.getString(PKG, "SlackBot.StandardFailure"));
         standardFailureLabelForm = new FormData();
         standardFailureLabelForm.left = new FormAttachment(10, 0);
         standardFailureLabelForm.right = new FormAttachment(100, 0);
@@ -441,7 +441,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
                     List<String> vars = jobMeta.getUsedVariables();
                     SlackConnection slack = new SlackConnection(meta.environmentSubstitute(wToken.getText()));
                     if (!slack.getAuthStatus()) {
-                        throw new ConnectException("Couldn't connect to Slack");
+                        throw new ConnectException(BaseMessages.getString(PKG, "SlackBot.ConnectionError"));
                     }
                     int roomType;
                     String listName;
@@ -460,7 +460,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
                     JsonObject jObject = parsed.getAsJsonObject();
                     String status = jObject.get("ok").toString();
                     if (!status.equals("true")) {
-                        new ConnectException("Couldn't get list");
+                        new ConnectException(BaseMessages.getString(PKG, "SlackBot.ConnectionErrorList"));
                     }
                     JsonArray jarray = jObject.getAsJsonArray(listName);
                     List<String> options = new LinkedList<String>();
@@ -471,8 +471,8 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
                     wChannel.setItems(options.toArray(new String[options.size()]));
                 } catch (Exception ex) {
                     MessageBox mb = new MessageBox(shell, SWT.OK | SWT.ICON_ERROR );
-                    mb.setText("Slack Connection Error");
-                    mb.setMessage("Unable to connect to Slack to update list. Please enter channel manually or try again.");
+                    mb.setText(BaseMessages.getString(PKG, "SlackBot.ConnectionError.Title"));
+                    mb.setMessage(BaseMessages.getString(PKG, "SlackBot.ConnectionError.Message"));
                     mb.open();
                 }
 
@@ -481,8 +481,8 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
 
 
         customMessageLabel = new Label(contentGroup, SWT.LEFT);
-        customMessageLabel.setText("Send Custom Message");
-        customMessageLabel.setToolTipText("Send a customized message you write below");
+        customMessageLabel.setText(BaseMessages.getString(PKG, "SlackBot.Custom"));
+        customMessageLabel.setToolTipText(BaseMessages.getString(PKG, "SlackBot.CustomTip"));
         customMessageLabelForm = new FormData();
         customMessageLabelForm.left = new FormAttachment(10, 0);
         customMessageLabelForm.right = new FormAttachment(100, 0);
@@ -500,7 +500,7 @@ public class SlackBotDialog extends JobEntryDialog implements JobEntryDialogInte
         props.setLook(separator2);
 
         customTextLabel = new Label(contentGroup, SWT.LEFT);
-        customTextLabel.setText("Input Custom Message Below");
+        customTextLabel.setText(BaseMessages.getString(PKG, "SlackBot.CustomMsgLabel"));
         customTextLabelForm = new FormData();
         customTextLabelForm.left = new FormAttachment(0, 0);
         customTextLabelForm.right = new FormAttachment(100,0);
