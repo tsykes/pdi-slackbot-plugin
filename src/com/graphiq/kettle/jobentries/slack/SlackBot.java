@@ -57,8 +57,8 @@ import static com.graphiq.kettle.jobentries.slack.BotIcons.botIcons;
  */
 @JobEntry(
         id = "SlackBotJobEntry",
-        image = "com/findthebest/slack/resources/icon.png",
-        i18nPackageName="com.findthebest.slack",
+        image = "com/graphiq/kettle/jobentries/slack/resources/icon.png",
+        i18nPackageName="com.graphiq.kettle.jobentries.slack",
         name="SlackBotJobEntry.Name",
         description = "SlackBotJobEntry.TooltipDesc",
         categoryDescription="SlackBotJobEntry.Category"
