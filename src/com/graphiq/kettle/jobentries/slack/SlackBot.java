@@ -48,11 +48,10 @@ import org.w3c.dom.Node;
 import static com.graphiq.kettle.jobentries.slack.BotIcons.botIcons;
 
 /**
- * This defines a 'create folder' job entry. Its main use would be to create empty folder that can be used to control
- * the flow in ETL cycles.
+ * This defines a job entry that allows you to post a message to a Slack channel or group
  *
- * @author Sven/Samatar
- * @since 18-10-2007
+ * @author Andrew Overton / Matt Rybak
+ * @since 08-28-2015
  *
  */
 @JobEntry(
