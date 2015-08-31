@@ -17,10 +17,6 @@ import java.net.URLEncoder;
 import java.util.InputMismatchException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 /**
  * Created by aoverton on 6/11/15.
@@ -36,7 +32,6 @@ public class SlackConnection {
     private StringBuilder baseMessageUrl = new StringBuilder("https://slack.com/api/chat.postMessage?");
     private Boolean authStatus;
     private String token;
-    private final static Logger LOGGER = Logger.getLogger(SlackConnection.class.getName());
     public final static int CHANNEL = 1, GROUP = 2, DM = 3;
 
 
@@ -58,14 +53,10 @@ public class SlackConnection {
         try {
             gson = new Gson();
             token = passedToken;
-            configLogger(Level.CONFIG);
             String authUrlString = baseAuthUrl + token;
-            LOGGER.config("Attempting to Auth");
             HttpsURLConnection con = sendGetRequest(new URL(authUrlString));
-            LOGGER.config("Checking response code");
             int response = con.getResponseCode();
             if (response == OK) {
-                LOGGER.config("Setting auth status");
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(con.getInputStream()));
                 LinkedTreeMap result = gson.fromJson(in, LinkedTreeMap.class);
@@ -87,15 +78,6 @@ public class SlackConnection {
      * Methods
      */
 
-    private void configLogger(Level logLevel) {
-
-        LOGGER.setLevel(logLevel);
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setFormatter(new SimpleFormatter());
-        handler.setLevel(logLevel);
-        LOGGER.addHandler(handler);
-    }
-
     private HttpsURLConnection sendGetRequest(URL url) throws IOException {
         return (HttpsURLConnection) url.openConnection();
     }
@@ -116,7 +98,6 @@ public class SlackConnection {
 
     public boolean postToSlack(String channel, String message, String username, String icon) throws IOException {
         if (authStatus) {
-            LOGGER.config("Building GET request");
             LinkedHashMap<String,String> params = new LinkedHashMap<String, String>();
             params.put("token", token);
             params.put("channel", channel.startsWith("#") ? channel : "#" + channel);
@@ -132,14 +113,9 @@ public class SlackConnection {
                 baseMessageUrl.append("&");
             }
             baseMessageUrl.deleteCharAt(baseMessageUrl.length() - 1);  // delete trailing &
-            LOGGER.config("Sending GET request");
-            LOGGER.config(baseMessageUrl.toString());
             HttpsURLConnection con = sendGetRequest(new URL(baseMessageUrl.toString()));
             String response = extractResponse(con);
-            LOGGER.config(response);
             return determineStatus(response);
-        } else {
-            LOGGER.severe("Client not authed");
         }
         return false;
     }
@@ -159,10 +135,8 @@ public class SlackConnection {
             default:
                 throw new InputMismatchException("Not a valid option for a room type");
         }
-        LOGGER.config("Getting room information");
         HttpsURLConnection con = sendGetRequest(new URL(url));
         String response = extractResponse(con);
-        LOGGER.info(response);
         return response;
 
     }
