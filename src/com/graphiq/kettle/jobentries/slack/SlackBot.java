@@ -34,6 +34,7 @@ import org.pentaho.di.core.Const;
 import org.pentaho.di.core.Result;
 import org.pentaho.di.core.annotations.JobEntry;
 import org.pentaho.di.core.database.DatabaseMeta;
+import org.pentaho.di.core.encryption.Encr;
 import org.pentaho.di.core.exception.KettleDatabaseException;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.exception.KettleXMLException;
@@ -149,7 +150,7 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
         StringBuffer retval = new StringBuffer();
 
         retval.append(super.getXML());
-        retval.append("      ").append(XMLHandler.addTagValue("token", token));
+        retval.append("      ").append(XMLHandler.addTagValue("token", Encr.encryptPasswordIfNotUsingVariables(token)));
         retval.append("      ").append(XMLHandler.addTagValue("selectedChannel", selectedChannel));
         retval.append("      ").append(XMLHandler.addTagValue("botName", botName));
         retval.append("      ").append(XMLHandler.addTagValue("botIcon", botIcon));
@@ -185,7 +186,7 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
 
         try{
             super.loadXML(entrynode, databases, slaveServers);
-            setToken(XMLHandler.getTagValue(entrynode, "token"));
+            setToken(Encr.decryptPasswordOptionallyEncrypted(XMLHandler.getTagValue(entrynode, "token")));
             setSelectedChannel(XMLHandler.getTagValue(entrynode, "selectedChannel"));
             botName = XMLHandler.getTagValue(entrynode, "botName");
             botIcon = XMLHandler.getTagValue(entrynode, "botIcon");
@@ -221,9 +222,16 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
 
         try{
             rep.saveJobEntryAttribute(id_job, getObjectId(), "selectedChannel", selectedChannel);
+            rep.saveJobEntryAttribute(id_job, getObjectId(), "token", Encr.encryptPasswordIfNotUsingVariables(token));
+            rep.saveJobEntryAttribute(id_job, getObjectId(), "postType", postType);
+            rep.saveJobEntryAttribute(id_job, getObjectId(), "botName", botName);
+            rep.saveJobEntryAttribute(id_job, getObjectId(), "successMsg", successMsg);
+            rep.saveJobEntryAttribute(id_job, getObjectId(), "failureMsg", failureMsg);
+            rep.saveJobEntryAttribute(id_job, getObjectId(), "customMsg", customMsg);
+            rep.saveJobEntryAttribute(id_job, getObjectId(), "customText", customText);
         }
         catch(KettleDatabaseException dbe){
-            throw new KettleException(BaseMessages.getString(PKG, "Demo.Error.UnableToSaveToRepository")+id_job, dbe);
+            throw new KettleException(BaseMessages.getString(PKG, "SlackBot.RepoSaveError")+id_job, dbe);
         }
     }
 
@@ -241,9 +249,16 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
     public void loadRep(Repository rep, IMetaStore metaStore, ObjectId id_jobentry, List<DatabaseMeta> databases, List<SlaveServer> slaveServers) throws KettleException{
         try{
             selectedChannel = rep.getJobEntryAttributeString(id_jobentry, "selectedChannel");
+            token = Encr.decryptPasswordOptionallyEncrypted(rep.getJobEntryAttributeString(id_jobentry, "token"));
+            postType = rep.getJobEntryAttributeString(id_jobentry, "postType");
+            botName = rep.getJobEntryAttributeString(id_jobentry, "botName");
+            successMsg = rep.getJobEntryAttributeBoolean(id_jobentry, "successMsg");
+            failureMsg = rep.getJobEntryAttributeBoolean(id_jobentry, "failureMsg");
+            customMsg = rep.getJobEntryAttributeBoolean(id_jobentry, "customMsg");
+            customText = rep.getJobEntryAttributeString(id_jobentry, "customText");
         }
         catch(KettleDatabaseException dbe){
-            throw new KettleException(BaseMessages.getString(PKG, "Demo.Error.UnableToLoadFromRepository")+id_jobentry, dbe);
+            throw new KettleException(BaseMessages.getString(PKG, "SlackBot.RepoLoadError")+id_jobentry, dbe);
         }
     }
 
