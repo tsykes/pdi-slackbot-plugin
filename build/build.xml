@@ -50,17 +50,17 @@
 
 	<target name="compile" depends="init" description="compile the source ">
 		<mkdir dir="${classes}" />
-		<javac source="1.6" target="1.6" srcdir="${src}" destdir="${classes}" debuglevel="lines,vars,source" debug="true">
-			<classpath refid="compile.classpath" />
-
+		<javac includeantruntime="false" source="1.6" target="1.6" srcdir="${src}" destdir="${classes}" debuglevel="lines,vars,source" debug="true">
+            <classpath refid="compile.classpath" />
 		</javac>
 	</target>
 
 	<target name="dist" depends="compile" description="generate the distribution">
 
 		<mkdir dir="${diststep}" />
+        <mkdir dir="${diststep}/lib" />
 
-		<!-- jar things up, also add the properties and icong files -->
+		<!-- jar things up, also add the properties and icon files -->
 		<copy todir="${classes}">
 			<fileset dir="${src}" includes="**/*.properties" />
 			<fileset dir="${src}" includes="**/*.png,**/*.svg" />
@@ -68,6 +68,16 @@
 
 		<!-- jar class up -->
 		<jar jarfile="${diststep}/${jarfilename}" basedir="${classes}"/>
+
+        <!-- move version file to dist folder-->
+        <copy todir="${diststep}">
+            <fileset file="${basedir}/version.xml"/>
+        </copy>
+
+        <!-- create lib folder with dependencies-->
+        <copy todir="${diststep}/lib">
+            <fileset file="${basedir}/lib/gson*.jar"/>
+        </copy>
 
         <!-- zip folder for distribution-->
         <zip destfile="${diststepdir}/${pluginname}.zip">
