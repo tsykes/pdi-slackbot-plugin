@@ -13,7 +13,7 @@
     <property name="classes" location="classes" />
     <property name="dist" location="dist" />
     <property name="diststepdir" location="${dist}/jobentries" />
-    <property name="pluginname" value="SlackBot" />
+    <property name="pluginname" value="SlackBotJobEntry" />
     <property name="diststep" location="${diststepdir}/${pluginname}" />
     <property name="jarfilename" value="slackbot-jobentry.jar" />
 
