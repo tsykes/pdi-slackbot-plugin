@@ -6,6 +6,7 @@
 
 	<!-- you can use this file to set the kettle-dir property or change it directly below -->
 	<property file="build/build.properties" />
+    <property file="build/creds.properties" />
 
     <!-- set global properties for this build -->
     <property name="src" location="src" />
@@ -23,6 +24,25 @@
 			<include name="**/*.jar" />
 		</fileset>
 	</path>
+
+    <!-- used for tests-->
+    <path id="test.classpath">
+        <fileset dir="${basedir}/lib">
+            <include name="**/*.jar" />
+        </fileset>
+        <fileset dir="${basedir}/test-lib">
+            <include name="**/*.jar" />
+        </fileset>
+        <fileset dir="${diststep}">
+            <include name="**/*.jar" />
+        </fileset>
+        <pathelement path="${testclasses.dir}"/>
+    </path>
+
+    <!-- set token-->
+    <condition property="token" value="${jtoken}" else="${ltoken}">
+        <isset property="jtoken"/>
+    </condition>
 
 	<target name="init">
 		<tstamp />
@@ -86,5 +106,114 @@
 		<delete dir="${classes}" />
 		<delete dir="${dist}" />
 	</target>
+
+    <!--=======================================================================
+      test
+
+      Compiles and runs all the tests for the project
+      ====================================================================-->
+    <target name="test" depends="compile,compile-tests, init-test-reports" description="Compiles and runs unit tests">
+        <junit maxmemory="${junit.maxmemory}"
+               fork="${fork}"
+               forkmode="${junit.forkmode}"
+               failureProperty="test.failed"
+               haltonfailure="${junit.haltonfailure}"
+               haltonerror="${junit.haltonerror}"
+               printsummary="yes">
+            <sysproperty key="java.awt.headless" value="${headless.unittest}"/>
+
+            <syspropertyset>
+                <propertyref prefix="junit.sysprop."/>
+                <propertyref name="token"/>
+                <mapper type="glob" from="junit.sysprop.*" to="*"/>
+            </syspropertyset>
+
+            <classpath refid="test.classpath"/>
+            <formatter type="xml"/>
+            <test name="${testcase}" todir="${testreports.xml.dir}"/>
+        </junit>
+
+        <junitreport todir="${testreports.html.dir}">
+            <fileset dir="${testreports.xml.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${testreports.html.dir}"/>
+        </junitreport>
+    </target>
+
+
+    <!--=======================================================================
+      clean-test-reports
+
+      Remove all xml and html JUnit test reports
+      ====================================================================-->
+    <target name="clean-test-reports">
+        <delete dir="${testreports.xml.dir}"/>
+        <delete dir="${testreports.html.dir}"/>
+    </target>
+
+
+    <!--=======================================================================
+      init-test-reports
+
+      Prepare directories for JUnit test reports
+      ====================================================================-->
+    <target name="init-test-reports" depends="clean-test-reports">
+        <mkdir dir="${testreports.xml.dir}"/>
+        <mkdir dir="${testreports.html.dir}"/>
+    </target>
+
+    <!--=======================================================================
+      compile-tests
+
+      Compiles project test source
+      ====================================================================-->
+    <target name="compile-tests" depends="init-tests">
+        <javac destdir="${testclasses.dir}"
+               debug="true"
+               optimize="false"
+               source="${javac.source}"
+               target="${javac.target}"
+               fork="true"
+               encoding="UTF-8">
+            <src path="${testsrc.dir}"/>
+            <classpath refid="test.classpath"/>
+        </javac>
+
+        <!-- Copy the non-java files from the source directory to the test classes directory -->
+        <copy todir="${testclasses.dir}">
+            <fileset dir="${testsrc.dir}">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!--=======================================================================
+      clean-tests
+
+      Removes all files related to tests
+      ====================================================================-->
+    <target name="clean-tests">
+        <delete dir="${testbin.dir}"/>
+    </target>
+
+
+    <!--=======================================================================
+        init-tests
+
+        Compiles project test source
+        ====================================================================-->
+    <target name="init-tests" depends="clean-tests">
+        <mkdir dir="${testclasses.dir}"/>
+        <mkdir dir="${testsrc.dir}"/>
+        <!-- Sonar will fail if no src or classes dir -->
+        <mkdir dir="${src}"/>
+        <mkdir dir="${classes}"/>
+    </target>
+
+    <target name="dist-test" depends="test,dist" description="Run tests and then create dist">
+
+    </target>
+
 
 </project>
