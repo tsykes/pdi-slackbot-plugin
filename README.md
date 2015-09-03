@@ -3,7 +3,7 @@
 This job entry allows you to send messages to Slack channels or groups.
 
 ## Use Cases
-This is a useful alternative to providing status update alerts via email for several reasons.
+This is a useful alternative to providing status update alerts via email for several reasons:
 
 + Slack has smart notification rules, which allows you to respond to urgent messages and get to non-critical issues when you have time
 + You can create a group/channel for each job or group the alerts into one group/channel, either way it's easy for you and others to organize your alerts
