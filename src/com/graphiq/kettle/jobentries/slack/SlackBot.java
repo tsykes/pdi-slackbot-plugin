@@ -303,7 +303,7 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
             // indicate there are no errors
             prev_result.setNrErrors(errors);
         } catch (Exception e) {
-            logBasic(e.getMessage());
+            logError(e.getMessage());
             errors++;
             outcome = false;
         }
