@@ -1,5 +1,7 @@
 # SlackBot - PDI Plugin
 
+[![Build Status](https://travis-ci.org/graphiq-data/pdi-slackbot-plugin.svg?branch=master)](https://travis-ci.org/graphiq-data/pdi-slackbot-plugin)
+
 This job entry allows you to send messages to Slack channels or groups.
 
 ## Use Cases
