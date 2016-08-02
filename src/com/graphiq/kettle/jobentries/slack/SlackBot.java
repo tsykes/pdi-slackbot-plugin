@@ -296,7 +296,8 @@ public class SlackBot extends JobEntryBase implements Cloneable, JobEntryInterfa
             if (isDebug()) {
                 logBasic(slack.toString());
             }
-            boolean result = slack.postToSlack(selectedChannel, msg, botName, botIcon);
+            String resolvedChannel = environmentSubstitute(selectedChannel);
+            boolean result = slack.postToSlack(resolvedChannel, msg, botName, botIcon);
             if (!result) {
                 throw new ConnectException(BaseMessages.getString(PKG, "SlackBot.PostError"));
             }
